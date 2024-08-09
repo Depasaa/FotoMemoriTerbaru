@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Panel - FotoMemori">
+    <meta name="author" content="Depasaa">
+    <title>Admin Panel - FotoMemori</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link href="dist/css/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/navmenu-reveal.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="navmenu navmenu-default navmenu-fixed-left">
+        <ul class="nav navmenu-nav">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="manage-users.html">Kelola Pengguna</a></li>
+            <li><a href="manage-photographers.html">Kelola Fotografer</a></li>
+            <li><a href="manage-orders.html">Kelola Pesanan</a></li>
+            <li><a href="settings.html">Pengaturan</a></li>
+            <li><a href="logout.html">Logout</a></li>
+        </ul>
+        <a class="navmenu-brand" href="#"><img src="img/logo.png" width="160"></a>
+        <div class="social">
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-pinterest-p"></i></a>
+            <a href="#"><i class="fa fa-google-plus"></i></a>
+            <a href="#"><i class="fa fa-skype"></i></a>
+        </div>
+        <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="canvas">
+        <header class="navbar navbar-default navbar-fixed-top">
+            <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".navmenu" data-canvas=".canvas">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Admin Panel</a>
+        </header>
+
+        <div class="container page-container">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Selamat datang di Admin Panel. Kelola fitur dan pengguna dari sini.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Pengguna Terdaftar</div>
+                        <div class="panel-body">
+                            <h3>150 Pengguna</h3>
+                            <p>Pengguna yang terdaftar dalam sistem.</p>
+                            <a href="manage-users.html" class="btn btn-primary">Kelola Pengguna</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">Fotografer Aktif</div>
+                        <div class="panel-body">
+                            <h3>45 Fotografer</h3>
+                            <p>Fotografer aktif yang terdaftar.</p>
+                            <a href="manage-photographers.html" class="btn btn-success">Kelola Fotografer</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">Pesanan Terbaru</div>
+                        <div class="panel-body">
+                            <h3>32 Pesanan</h3>
+                            <p>Pesanan yang sedang diproses.</p>
+                            <a href="manage-orders.html" class="btn btn-info">Kelola Pesanan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.container -->
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="dist/js/jasny-bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
