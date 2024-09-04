@@ -7,6 +7,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$message_status = "";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
@@ -16,35 +18,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
 
     if ($conn->query($sql) === TRUE) {
-        // Redirect ke halaman login atau halaman lain setelah pendaftaran berhasil
-        header("Location: index.html"); // Ganti 'login.php' dengan halaman yang diinginkan
-        exit(); // Menghentikan eksekusi skrip untuk mencegah output lebih lanjut
+        // Pendaftaran berhasil
+        $message_status = "success";
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
-    }
-
-    if ($conn->query($sql) === TRUE) {
-        echo "Registration successful!";
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        // Pendaftaran gagal
+        $message_status = "error";
     }
 }
 
 $conn->close();
 ?>
 
-
 <!DOCTYPE html>
-<!-- Coding by CodingNepal | www.codingnepalweb.com-->
 <html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
-    <title> Login and Registration Form</title>
+    <title>Register Form</title>
     <link rel="stylesheet" href="login.css">
     <!-- Fontawesome CDN Link -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -90,8 +90,35 @@ $conn->close();
                             <div class="text sign-up-text">Sudah punya akun? <a href="login.php">Login</a></div>
                         </div>
                     </form>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- SweetAlert2 Notification -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var status = "<?php echo $message_status; ?>";
+
+            if (status === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pendaftaran Berhasil!',
+                    text: 'Anda akan segera dialihkan ke halaman login.',
+                    confirmButtonText: 'OK'
+                }).then(function() {
+                    window.location.href = 'login.php'; // Redirect ke halaman user.html setelah berhasil
+                });
+            } else if (status === "error") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pendaftaran Gagal!',
+                    text: 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
