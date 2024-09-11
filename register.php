@@ -14,15 +14,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Enkripsi password
 
-    // Query untuk menyimpan data
-    $sql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
+    // Query untuk memeriksa apakah email sudah terdaftar
+    $checkEmailSql = "SELECT * FROM users WHERE email = '$email'";
+    $checkEmailResult = $conn->query($checkEmailSql);
 
-    if ($conn->query($sql) === TRUE) {
-        // Pendaftaran berhasil
-        $message_status = "success";
+    if ($checkEmailResult->num_rows > 0) {
+        // Email sudah terdaftar
+        $message_status = "error_email";
     } else {
-        // Pendaftaran gagal
-        $message_status = "error";
+        // Query untuk menyimpan data
+        $sql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
+
+        if ($conn->query($sql) === TRUE) {
+            // Pendaftaran berhasil
+            $message_status = "success";
+        } else {
+            // Pendaftaran gagal
+            $message_status = "error";
+        }
     }
 }
 
@@ -30,95 +39,199 @@ $conn->close();
 ?>
 
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Register Form</title>
-    <link rel="stylesheet" href="login.css">
-    <!-- Fontawesome CDN Link -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <style>
+  @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap");
 
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Open Sans", sans-serif;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url("background1.jpg"), #000;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .wrapper {
+    width: 400px;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+
+  .input-field {
+    position: relative;
+    border-bottom: 2px solid #ccc;
+    margin: 15px 0;
+  }
+
+  .input-field label {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 16px;
+    pointer-events: none;
+    transition: 0.15s ease;
+  }
+
+  .input-field input {
+    width: 100%;
+    height: 40px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #fff;
+  }
+
+  .input-field input:focus~label,
+  .input-field input:valid~label {
+    font-size: 0.8rem;
+    top: 10px;
+    transform: translateY(-120%);
+  }
+
+  button {
+    background: #fff;
+    color: #000;
+    font-weight: 600;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    color: #fff;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .register {
+    text-align: center;
+    margin-top: 30px;
+    color: #fff;
+  }
+  </style>
+  
+  <!-- SweetAlert2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
 <body>
-    <div class="container">
-        <input type="checkbox" id="flip">
-        <div class="cover">
-            <div class="front">
-                <img src="LogoFotoMemoriRev.jpeg" alt="">
-                <div class="text">
-                    <span class="text-1">Halo, Semuanya! <br>Selamat Datang</span>
-                    <span class="text-2">Daftarkan diri anda dan mulai gunakan layanan kami segera</span>
-                </div>
-            </div>
-            <div class="back">
-                <img class="backImg" src="LogoFotoMemoriRev.jpeg" alt="">
-                <div class="text">
-                    <span class="text-1">Complete miles of journey <br> with one step</span>
-                    <span class="text-2">Let's get started</span>
-                </div>
-            </div>
-        </div>
-        <div class="forms">
-            <div class="form-content">
-                <div class="signup-form">
-                    <div class="title">Register</div>
-                    <form action="register.php" method="POST">
-                        <div class="input-boxes">
-                            <div class="input-box">
-                                <i class="fas fa-user"></i>
-                                <input type="text" name="name" placeholder="Nama" required>
-                            </div>
-                            <div class="input-box">
-                                <i class="fas fa-envelope"></i>
-                                <input type="email" name="email" placeholder="Email" required>
-                            </div>
-                            <div class="input-box">
-                                <i class="fas fa-lock"></i>
-                                <input type="password" name="password" placeholder="Sandi" required>
-                            </div>
-                            <div class="button input-box">
-                                <input type="submit" value="Submit">
-                            </div>
-                            <div class="text sign-up-text">Sudah punya akun? <a href="login.php">Login</a></div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div class="wrapper">
+    <form action="register.php" method="POST">
+      <h2>Register</h2>
+      
+      <!-- Input for Name -->
+      <div class="input-field">
+        <input type="text" name="name" required>
+        <label>Masukan Nama</label>
+      </div>
+      
+      <!-- Input for Email -->
+      <div class="input-field">
+        <input type="email" name="email" required>
+        <label>Masukan Email</label>
+      </div>
+      
+      <!-- Input for Password -->
+      <div class="input-field">
+        <input type="password" name="password" required>
+        <label>Masukan Sandi</label>
+      </div>
+      
+      <button type="submit">Register</button>
+      
+      <div class="register">
+        <p>Sudah punya akun? <a href="login.php">Login</a></p>
+      </div>
+    </form>
+  </div>
 
-    <!-- SweetAlert2 Notification -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var status = "<?php echo $message_status; ?>";
+  <!-- SweetAlert2 Notification -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var status = "<?php echo $message_status; ?>";
 
-            if (status === "success") {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Pendaftaran Berhasil!',
-                    text: 'Anda akan segera dialihkan ke halaman login.',
-                    confirmButtonText: 'OK'
-                }).then(function() {
-                    window.location.href = 'login.php'; // Redirect ke halaman user.html setelah berhasil
-                });
-            } else if (status === "error") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Pendaftaran Gagal!',
-                    text: 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
-    </script>
+        if (status === "success") {
+            Swal.fire({
+                icon: 'success',
+                title: 'Pendaftaran Berhasil!',
+                text: 'Anda akan segera dialihkan ke halaman login.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#28a745', // Warna tombol OK
+                background: '#343a40', // Background alert
+                color: '#fff', // Teks alert
+                iconColor: '#28a745' // Warna icon success
+            }).then(function() {
+                window.location.href = 'login.php'; // Redirect ke halaman login setelah berhasil
+            });
+        } else if (status === "error_email") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pendaftaran Gagal!',
+                text: 'Email ini sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#dc3545', // Warna tombol OK
+                background: '#343a40', // Background alert
+                color: '#fff', // Teks alert
+                iconColor: '#dc3545' // Warna icon error
+            });
+        } else if (status === "error") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pendaftaran Gagal!',
+                text: 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#dc3545', // Warna tombol OK
+                background: '#343a40', // Background alert
+                color: '#fff', // Teks alert
+                iconColor: '#dc3545' // Warna icon error
+            });
+        }
+    });
+  </script>
 </body>
-
 </html>

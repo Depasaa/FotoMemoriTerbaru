@@ -1,87 +1,3 @@
-<?php
-// Koneksi ke database
-$servername = "localhost";
-$username = "root"; // Sesuaikan dengan user database kamu
-$password = ""; // Sesuaikan dengan password database kamu
-$dbname = "db_fotomemori";
-
-// Membuat koneksi
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Cek koneksi
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$message_status = "";
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $message = $_POST['message'];
-
-    // Validasi input (opsional)
-    if (!empty($name) && !empty($email) && !empty($message)) {
-        // SQL untuk menyimpan data
-        $sql = "INSERT INTO contact (name, email, message) VALUES ('$name', '$email', '$message')";
-
-        if ($conn->query($sql) === TRUE) {
-            $message_status = "success";
-        } else {
-            $message_status = "error";
-        }
-    } else {
-        $message_status = "empty";
-    }
-}
-
-$conn->close();
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<!-- head dan konten lainnya -->
-<body class="contact-page">
-    <!-- Form contact seperti sebelumnya -->
-    <!-- Modal sukses menggunakan SweetAlert2 -->
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="dist/js/jasny-bootstrap.min.js"></script>
-
-    <script>
-    $(document).ready(function(){
-        var status = "<?php echo $message_status; ?>";
-
-        if (status === "success") {
-            Swal.fire({
-                icon: 'success',
-                title: 'Pesan Terkirim!',
-                text: 'Pesan Anda telah berhasil dikirim. Terima kasih atas masukan Anda!',
-                confirmButtonText: 'OK'
-            });
-        } else if (status === "error") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'Terjadi kesalahan saat mengirim pesan. Coba lagi nanti.',
-                confirmButtonText: 'OK'
-            });
-        } else if (status === "empty") {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Input Kosong!',
-                text: 'Semua field harus diisi!',
-                confirmButtonText: 'OK'
-            });
-        }
-    });
-    </script>
-</body>
-</html>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
@@ -95,7 +11,6 @@ $conn->close();
     <title>FotoMemori</title>
 
     <!-- Bootstrap core CSS -->
-   
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href="dist/css/jasny-bootstrap.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
@@ -103,39 +18,102 @@ $conn->close();
     <!-- Custom styles for this template -->
     <link href="css/navmenu-reveal.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <link href="css/full-slider.css" rel="stylesheet">
-    
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
     
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Style for Dark Mode and Clean Mode -->
+    <style>
+        body {
+            transition: background-color 0.5s, color 0.5s;
+        }
+        body.clean-mode {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .navbar-toggle .icon-bar {
+            background-color: #000;
+        }
+        body.dark-mode .navbar-toggle .icon-bar {
+            background-color: #fff;
+        }
+        .carousel-caption h2, .carousel-caption h1 {
+            transition: color 0.5s;
+        }
+        body.dark-mode .carousel-caption h2, body.dark-mode .carousel-caption h1 {
+            color: #ffffff;
+        }
+        .navmenu {
+            background-color: #f8f8f8;
+            transition: background-color 0.5s;
+        }
+        body.dark-mode .navmenu {
+            background-color: #333;
+        }
+        .social a {
+            color: #000;
+            transition: color 0.5s;
+        }
+        body.dark-mode .social a {
+            color: #fff;
+        }
+        .navmenu a {
+            color: #000;
+            transition: color 0.5s;
+        }
+        body.dark-mode .navmenu a {
+            color: #fff;
+        }
+        footer {
+            background-color: #f8f8f8;
+            padding: 10px 0;
+            text-align: center;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        body.dark-mode footer {
+            background-color: #333;
+            color: #fff;
+        }
+        /* Toggle button */
+        #toggleMode {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        #toggleMode:hover {
+            background-color: #0056b3;
+        }
+    </style>
 
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
 
-    <!-- ... kode CSS & JS lainnya seperti Bootstrap ... -->
-
-  </head>
-
-  <body class="contact-page">
- <div class="bar">
+<body class="clean-mode">
+  <div class="bar">
     <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-recalc="false" data-target=".navmenu" data-canvas=".canvas">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
     </button>
   </div>
-    <div class="navmenu navmenu-default navmenu-fixed-left">
-      
-      <ul class="nav navmenu-nav">
+
+  <div class="navmenu navmenu-default navmenu-fixed-left">
+     <ul class="nav navmenu-nav">
         <li><a href="index.html">Beranda</a></li>
-        <li><a href="works.html">Galei Karya</a></li>
+        <li><a href="works.html">Galeri Karya</a></li>
         <li><a href="blog.html">Fotografer</a></li>
         <li><a href="contact.php">Hubungi</a></li>
         <li><a href="login.php">Login</a></li>
@@ -147,59 +125,106 @@ $conn->close();
         <a href="#"><i class="fa fa-youtube"></i></a>
       </div>
       <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
-    </div>
-    </div>
+  </div>
 
-      
+  <div id="myCarousel" class="canvas carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators xtra-border">
+      <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#myCarousel" data-slide-to="1"></li>
+      <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol>
 
-    <div class="canvas contact-page">
-      <div class="contact-bg col-md-8 col-sm-12">
-        <img src="img/dolon.jpg" alt="" width="100%">
+    <div class="carousel-inner" role="listbox">
+      <div class="item active">
+        <img src="background1.jpg" alt="First slide">
+        <div class="carousel-caption">
+          <h2 class="sub-title-home">Kami Tidak Mengambil Foto</h2>
+          <h1 class="title-home">Kami Membuatnya</h1>
+        </div>
       </div>
-      <div class="col-md-4 col-sm-12 contact-bar">
-        <img class="map-img" src="img/map.jpg" alt="" width="100%">
-        <h3 class="interest-text text-center"> Terima Kasih Atas Masukkan Anda </h3>
-        <br>
-        <div class="col-md-6 add-text">
-        Mohon gunakan kata-kata yang sopan ketika anda ingin memberikan masukan
+      <div class="item">
+        <img src="background2.jpg" alt="Second slide">
+        <div class="carousel-caption">
+          <h2 class="sub-title-home">Kami Tidak Mengambil Foto</h2>
+          <h1 class="title-home">Kami Membuatnya</h1>
         </div>
-        <div class="col-md-6 add-text">
-          defasamaulanaa@gmail.com
-          Gadang gg VIII No. 06
-          +62 85731095875
-        </div>
-        <br>
-        <div class="col-sm-12 col-md-12">
-            <form method="post" action="contact.php">
-                <div class="controls controls-row">
-                   <div class="">
-                    <input id="name" name="name" type="text" class="form-control" placeholder="Name"> 
-                    </div>
-                     <div class="">
-                      <input id="email" name="email" type="email" class="col-md-6 form-control" placeholder="Email address">
-                    </div>
-                </div>
-                <div class="controls">
-                    <textarea id="message" name="message" class="col-md-12" placeholder="Your Message" rows="5"></textarea>
-                </div>
-                  
-                <div class="controls btn-full">
-                    <button id="contact-submit" name="submit" value="Submit" type="submit" class="btn btn-primary">Kirim</button>
-                </div>
-            </form>
+      </div>
+      <div class="item">
+        <img src="background3.jpg" alt="Third slide">
+        <div class="carousel-caption">
+          <h2 class="sub-title-home">Kami Tidak Mengambil Foto</h2>
+          <h1 class="title-home">Kami Membuatnya</h1>
         </div>
       </div>
     </div>
+  </div>
 
-      
-    
+  <button id="toggleMode">Toggle Mode</button>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="dist/js/jasny-bootstrap.min.js"></script>
-  </body>
+  <!-- Section About -->
+  <div class="about-section">
+    <div class="container">
+      <h2>Tentang Kami</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <i class="fa fa-camera fa-3x" aria-hidden="true"></i>
+          <h4>Fotografi Profesional</h4>
+          <p>Menangkap setiap momen dengan sempurna. Tim fotografer kami memiliki pengalaman bertahun-tahun di berbagai acara.</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-heart fa-3x" aria-hidden="true"></i>
+          <h4>Personalized Service</h4>
+          <p>Setiap klien adalah unik. Kami memastikan setiap sesi foto mencerminkan kepribadian dan kebutuhan Anda.</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-thumbs-up fa-3x" aria-hidden="true"></i>
+          <h4>Hasil Terbaik</h4>
+          <p>Kami tidak hanya mengambil foto, kami menciptakan karya seni yang dapat dikenang seumur hidup.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Services -->
+  <div class="services-section">
+    <div class="container">
+      <h2>Layanan Kami</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <i class="fa fa-venus fa-3x" aria-hidden="true"></i>
+          <h4>Wedding Photography</h4>
+          <p>Mengabadikan setiap momen penuh cinta dari hari pernikahan Anda.</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-users fa-3x" aria-hidden="true"></i>
+          <h4>Family Portraits</h4>
+          <p>Potret keluarga yang indah untuk kenangan seumur hidup.</p>
+        </div>
+        <div class="col-md-4">
+          <i class="fa fa-birthday-cake fa-3x" aria-hidden="true"></i>
+          <h4>Event Photography</h4>
+          <p>Mengabadikan momen terbaik dari setiap acara yang Anda selenggarakan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>©2024 FotoMemori | All Rights Reserved</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="dist/js/jasny-bootstrap.min.js"></script>
+
+  <!-- Script to Toggle Dark and Clean Mode -->
+  <script>
+    document.getElementById('toggleMode').addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('clean-mode');
+    });
+  </script>
+</body>
 </html>
-

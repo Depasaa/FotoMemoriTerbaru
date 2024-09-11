@@ -1,3 +1,27 @@
+<?php
+require 'koneksi.php'; // Menghubungkan ke database
+
+// Mengambil data jumlah user dari database
+$stmtUserCount = $conn->prepare("SELECT COUNT(*) AS user_count FROM users");
+$stmtUserCount->execute();
+$userCount = $stmtUserCount->fetch(PDO::FETCH_ASSOC)['user_count'];
+
+// Mengambil data jumlah fotografer dari database
+$stmtFotograferCount = $conn->prepare("SELECT COUNT(*) AS fotografer_count FROM users WHERE role = 'fotografer'");
+$stmtFotograferCount->execute();
+$fotograferCount = $stmtFotograferCount->fetch(PDO::FETCH_ASSOC)['fotografer_count'];
+
+// Mengambil data pendapatan dari database (misal, total pendapatan bisa ditambahkan)
+// $stmtPendapatan = $conn->prepare("SELECT SUM(amount) AS total_pendapatan FROM transactions");
+// $stmtPendapatan->execute();
+// $pendapatan = $stmtPendapatan->fetch(PDO::FETCH_ASSOC)['total_pendapatan'];
+
+// Mengambil data user dari database
+$stmt = $conn->prepare("SELECT id, name, email, role FROM users ORDER BY id ASC");
+$stmt->execute();
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,21 +76,20 @@
 
     <div class="navmenu navmenu-default navmenu-fixed-left">
         <ul class="nav navmenu-nav">
-            <li><a href="adminpanel.html">Dashboard</a></li>
-            <li><a href="manageuser.html">Manage User</a></li>
-            <li><a href="managefotografer.html">Manage Fotografer</a></li>
+            <li><a href="adminpanel.php">Dashboard</a></li>
+            <li><a href="manageuser.php">Manage User</a></li>
+            <li><a href="managefotografer.php">Manage Fotografer</a></li>
             <li><a href="pendapatan.html">Pendapatan</a></li>
             <li><a href="masukan.php">Masukan</a></li>
             <li><a href="logout.html">Logout</a></li>
         </ul>
         <a class="navmenu-brand" href="#"><img src="LogoFotoMemoriRevTransparant.png" width="160"></a>
         <div class="social">
-          <a href="#"><i class="fa fa-facebook"></i></a>
-          <a href="#"><i class="fa fa-instagram"></i></a>
-          <a href="#"><i class="fa fa-youtube"></i></a>
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-youtube"></i></a>
         </div>
         <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
-      </div>
     </div>
 
     <div class="canvas">
@@ -83,7 +106,7 @@
                                     <h3 class="panel-title">Jumlah User</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <h1>150</h1> <!-- Example number -->
+                                    <h1><?php echo $userCount; ?></h1>
                                 </div>
                             </div>
                         </div>
@@ -93,7 +116,7 @@
                                     <h3 class="panel-title">Jumlah Fotografer</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <h1>45</h1> <!-- Example number -->
+                                    <h1><?php echo $fotograferCount; ?></h1>
                                 </div>
                             </div>
                         </div>
@@ -103,7 +126,7 @@
                                     <h3 class="panel-title">Pendapatan</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <h1>$0</h1> <!-- Example number -->
+                                    <h1>$0</h1> <!-- Contoh pendapatan, sesuaikan sesuai data -->
                                 </div>
                             </div>
                         </div>
@@ -112,7 +135,7 @@
                     <!-- Section for Manage Users -->
                     <div class="row mt-5">
                         <div class="col-md-12">
-                            <h2 class="h4 mb-3">Data User</h2>
+                            <h2 class="h4 mb-3">Data Semua User</h2>
                             <table class="table table-hover">
                                 <thead class="table-dark">
                                     <tr>
@@ -120,86 +143,19 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Role</th>
-                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php foreach ($users as $user): ?>
                                     <tr>
-                                        <td>1</td>
-                                        <td>John Doe</td>
-                                        <td>john@example.com</td>
-                                        <td>User</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </td>
+                                        <td><?php echo htmlspecialchars($user['id']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['name']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['role']); ?></td>
                                     </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Jane Smith</td>
-                                        <td>jane@example.com</td>
-                                        <td>User</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>Aks Laundrey</td>
-                                        <td>Aks@example.com</td>
-                                        <td>User</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>4</td>
-                                        <td>Aks Laundrey</td>
-                                        <td>Aks@example.com</td>
-                                        <td>User</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>5</td>
-                                        <td>Aks Laundrey</td>
-                                        <td>Aks@example.com</td>
-                                        <td>User</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>6</td>
-                                        <td>Aks Laundrey</td>
-                                        <td>Aks@example.com</td>
-                                        <td>User</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>7</td>
-                                        <td>Aks Laundrey</td>
-                                        <td>Aks@example.com</td>
-                                        <td>User</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Edit</button>
-                                            <button class="btn btn-danger btn-sm">Delete</button>
-                                        </td>
-                                    </tr>
-                                    <!-- More rows as needed -->
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
-                            <div class="text-end">
-                                <a href="manageuser.html" style="color: grey;">View More</a>
-                            </div>
                         </div>
                     </div>
                 </div>
