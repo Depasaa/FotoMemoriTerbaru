@@ -37,7 +37,7 @@ p {
 }
 
 .card-container .pro {
-    background-color: #FEBB0B;
+    background-color: #337ab7;
     border-radius: 3px;
     font-size: 14px;
     font-weight: bold;
@@ -70,11 +70,6 @@ button.primary {
     margin: 0 10px;
 }
 
-button.primary.ghost {
-    background-color: transparent;
-    color: #337ab7;
-}
-
 .skills {
     background-color: rgb(25, 25, 25);
     text-align: left;
@@ -98,14 +93,14 @@ button.primary.ghost {
 }
 
 .portfolio-gallery {
-    background-color:rgb(20, 20, 20);
+    background-color: rgb(20, 20, 20);
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 10px 20px -10px rgba(0, 0, 0, 0.75);
 }
 
 .portfolio-gallery h2 {
-    color: #FEBB0B;
+    color: #337ab7;
     text-align: center;
     margin-bottom: 20px;
 }
@@ -130,20 +125,13 @@ footer {
     padding: 20px;
     text-align: center;
 }
+
 .testimonial-section {
     background-color: rgb(20, 20, 20);
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 10px 20px -10px rgba(0, 0, 0, 0.75);
     margin-top: 40px;
-}
-
-.testimonial-title {
-    color: #FEBB0B;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 24px;
-    font-weight: bold;
 }
 
 .testimonial-grid {
@@ -158,40 +146,37 @@ footer {
     border-radius: 5px;
     padding: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    width: 32%;
-    color: #B3B8CD;
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
 }
 
 .testimonial-text {
     font-size: 14px;
-    font-style: italic;
     margin-bottom: 15px;
-    text-align: center;
 }
 
 .testimonial-author {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-top: 10px;
 }
 
 .testimonial-img {
-    width: 50px;
-    height: 50px;
     border-radius: 50%;
-    margin-right: 15px;
-    border: 1px solid #337ab7;
+    width: 40px;
+    margin-right: 10px;
 }
 
 .author-info h4 {
     margin: 0;
-    color: #FEBB0B;
+    font-size: 16px;
 }
 
-.author-info p {
-    margin: 0;
-    font-size: 12px;
-    color: #B3B8CD;
+.fade-in {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
 }
 
+.visible {
+    opacity: 1;
+}

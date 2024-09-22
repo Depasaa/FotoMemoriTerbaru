@@ -13,6 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Enkripsi password
+    $role = 'user'; // Set peran default sebagai 'user'
+    $profiluser = ''; // Atau bisa diset NULL
+    $phone = ''; // Atau bisa diset NULL
 
     // Query untuk memeriksa apakah email sudah terdaftar
     $checkEmailSql = "SELECT * FROM users WHERE email = '$email'";
@@ -22,8 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Email sudah terdaftar
         $message_status = "error_email";
     } else {
-        // Query untuk menyimpan data
-        $sql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
+        // Query untuk menyimpan data termasuk peran (role) dan kolom lainnya
+        $sql = "INSERT INTO users (profiluser, name, email, password, phone, role) 
+                VALUES ('$profiluser', '$name', '$email', '$password', '$phone', '$role')";
 
         if ($conn->query($sql) === TRUE) {
             // Pendaftaran berhasil
@@ -38,9 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $conn->close();
 ?>
 
+
 <!DOCTYPE html>
 <html>
 <head>
+<link href="loginn.css" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register</title>
@@ -68,7 +74,7 @@ $conn->close();
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url("background1.jpg"), #000;
+    background: url("blogin.jpg"), #000;
     background-position: center;
     background-size: cover;
   }
@@ -166,13 +172,13 @@ $conn->close();
       
       <!-- Input for Name -->
       <div class="input-field">
-        <input type="text" name="name" required>
+        <input type="text" name="name" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
         <label>Masukan Nama</label>
       </div>
       
       <!-- Input for Email -->
       <div class="input-field">
-        <input type="email" name="email" required>
+        <input type="email" name="email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
         <label>Masukan Email</label>
       </div>
       

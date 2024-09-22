@@ -12,17 +12,11 @@
 
 body {
   font-family: 'Raleway', sans-serif;
+  background: rgb(15, 14, 14);
 }
 
-.bar {
-  background-color: black;
-  height: 200%;
-  width: 30px;
-  position: fixed;
-}
-
-.canvas.canvas-slid {
-  left: 245px;
+.section{
+  margin: 50px 0 50px 0 ;
 }
 
 .social {
@@ -45,15 +39,18 @@ a.navmenu-brand {
 
 .canvas {
   position: relative;
-  left: 30px;
+  width: 1300px;
+  left: 215px;
+}
 
+.navmenu.navmenu-default.navmenu-fixed-left::-webkit-scrollbar{
+  display: none;
 }
 
 .navmenu.navmenu-default.navmenu-fixed-left {
-  margin-left: 30px;
   padding-top: 35px;
-  position: absolute;
-  /* z-index: 99; */
+  position: fixed;
+  z-index: 99;
 }
 
 .navbar.navbar-default button {
@@ -347,9 +344,8 @@ textarea#message {
 
 @media (min-width: 1200px) {
   .canvas.gallery {
-    margin-top: -20px;
-    padding: 10px;
-    /* margin-bottom: 28px; */
+    width: 1300px;
+    left: 215px;
   }
 }
 
@@ -511,18 +507,19 @@ textarea#message {
 .portfolio-section,
 .testimonial-section,
 .contact-section {
-  padding: 60px 0;
   color: #B3B8CD;
 }
 
 h2 {
-  color: #FEBB0B;
+  color: #337ab7;
   text-align: center;
   margin-bottom: 30px;
 }
 
 .row {
   display: flex;
+  width: 80%;
+  margin: 0 auto;
   justify-content: space-between;
 }
 
@@ -537,7 +534,7 @@ h2 {
 
 .service-box i,
 .testimonial-item i {
-  color: #FEBB0B;
+  color: #337ab7;
   margin-bottom: 10px;
 }
 
@@ -552,16 +549,11 @@ h2 {
   border-radius: 5px;
 }
 
-.testimonial-section {
-  padding: 60px 0;
-  background-color: #f5f5f5;
-}
-
 .testimonial-section h2 {
   text-align: center;
   font-size: 32px;
   margin-bottom: 40px;
-  color: #FEBB0B;
+  color: #337ab7;
 }
 
 .testimonial-box {
@@ -593,7 +585,7 @@ h2 {
 
 .prev-btn,
 .next-btn {
-  background-color: #FEBB0B;
+  background-color: #337ab7;
   border: none;
   padding: 10px;
   cursor: pointer;
@@ -615,15 +607,18 @@ h2 {
 }
 
 .contact-section .btn-primary {
-  background-color: #FEBB0B;
+  background-color:#337ab7;
   border: none;
 }
 
 footer {
   background-color: #222;
   color: #fff;
+  width: 1300px;
+  left: 215px;
   font-size: 14px;
   padding: 20px;
+  position: relative;
   text-align: center;
 }
 
@@ -645,4 +640,5 @@ footer {
 .fade-exit-active {
   opacity: 0;
 }
+
 

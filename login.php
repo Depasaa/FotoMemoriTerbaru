@@ -1,8 +1,7 @@
 <?php
-// Koneksi ke database
+session_start(); // Mulai sesi
 $conn = new mysqli('localhost', 'root', '', 'db_fotomemori');
 
-// Cek koneksi
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -13,23 +12,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Query untuk mencari user berdasarkan email
     $sql = "SELECT * FROM users WHERE email = '$email'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        // Verifikasi password
         if (password_verify($password, $user['password'])) {
-            // Login berhasil
-            $message_status = "success";
-        } else {
-            // Password salah
+          // Login berhasil
+          $_SESSION['loggedin'] = true; // Set sesi loggedin
+          $_SESSION['user_id'] = $user['id']; // Set sesi user_id jika diperlukan
+          header("Location: index.php"); // Redirect langsung ke halaman index
+          exit(); // Menghentikan eksekusi script lebih lanjut
+      }
+       else {
             $message_status = "error_password";
         }
     } else {
-        // Email tidak ditemukan
         $message_status = "error_email";
     }
 }
@@ -37,9 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $conn->close();
 ?>
 
+
 <!DOCTYPE html>
 <html>
 <head>
+<link href="loginn.css" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
@@ -67,7 +68,7 @@ $conn->close();
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url("background1.jpg"), #000;
+    background: url("blogin.jpg"), #000;
     background-position: center;
     background-size: cover;
   }
@@ -167,7 +168,7 @@ $conn->close();
     <form action="login.php" method="POST">
       <h2>Login</h2>
       <div class="input-field">
-        <input type="email" name="email" placeholder="Masukkan Email" required>
+        <input type="email" name="email" placeholder="Masukkan Email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required >
         <label>Masukkan Email</label>
       </div>
       <div class="input-field">
@@ -197,7 +198,7 @@ $conn->close();
                 color: '#fff', // Teks alert
                 iconColor: '#28a745' // Warna icon success
             }).then(function() {
-                window.location.href = 'index.html'; // Redirect ke halaman user.html
+                window.location.href = 'index.php'; // Redirect ke halaman user.html
             });
         } else if (status === "error_password") {
             Swal.fire({

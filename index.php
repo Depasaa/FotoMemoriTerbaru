@@ -1,3 +1,7 @@
+<?php
+session_start(); // Mulai sesi
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
@@ -12,50 +16,53 @@
   <title>FotoMemori</title>
 
   <!-- Bootstrap core CSS -->
-
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  <link href="dist/css/jasny-bootstrap.min.css" rel="stylesheet">
+  <link href="dist/css/jasny-bootstraps.min.css" rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/bootstrapss.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <!-- Custom styles for this template -->
-  <link href="css/navmenu-reveal.css" rel="stylesheet">
-  <link href="css/style.css" rel="stylesheet">
-
+  <link href="css/navmenu-reveals.css" rel="stylesheet">
+  <link href="css/stylesss.css" rel="stylesheet">
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+  <style>
+    .nav-icon {
+      margin-right: 5px;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="bar">
-    <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-recalc="false" data-target=".navmenu"
-      data-canvas=".canvas">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-  </div>
-  <div class="navmenu navmenu-default navmenu-fixed-left">
+  <div class="navmenu navmenu-default navmenu-fixed-left in">
     <ul class="nav navmenu-nav">
-      <li><a href="index.html">Beranda</a></li>
-      <li><a href="works.html">Galeri Karya</a></li>
-      <li><a href="blog.html">Fotografer</a></li>
-      <li><a href="contact.php">Hubungi</a></li>
-      <li><a href="login.php">Login</a></li>
+      <li><a href="index.php"><i class="fa fa-home nav-icon"></i> Beranda</a></li>
+      <li><a href="works.php"><i class="fa fa-image nav-icon"></i> Galeri Karya</a></li>
+      <li><a href="blog.php"><i class="fa fa-camera nav-icon"></i> Fotografer</a></li>
+      <?php if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
+        <li><a href="membership.php"><i class="fa fa-users nav-icon"></i> Membership</a></li>
+        <li><a href="edituser.php"><i class="fa fa-cog nav-icon"></i> Pengaturan</a></li>
+        <li><a href="logout.php" onclick="return confirmLogout();"><i class="fa fa-sign-out-alt nav-icon"></i> Logout</a></li>
+      <?php else: ?>
+        <li><a href="login.php"><i class="fa fa-sign-in-alt nav-icon"></i> Login</a></li>
+      <?php endif; ?>
     </ul>
     <a class="navmenu-brand" href="#"><img src="LogoFotoMemoriRevTransparant.png" width="160"></a>
     <div class="social">
-      <a href="#"><i class="fa fa-facebook"></i></a>
-      <a href="#"><i class="fa fa-instagram"></i></a>
-      <a href="#"><i class="fa fa-youtube"></i></a>
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
     </div>
+
     <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
   </div>
 
-  <div id="myCarousel" class="canvas carousel slide" data-ride="carousel">
+
+  <div id="myCarousel" class="carousel slide canvas" data-ride="carousel">
     <!-- Full Page Image Background Carousel Header -->
     <!-- Indicators -->
     <ol class="carousel-indicators xtra-border">
@@ -65,7 +72,7 @@
     </ol>
 
     <!-- Wrapper for Slides -->
-    <div class="carousel-inner" role="listbox">
+    <div class="carousel-inner " role="listbox">
       <div class="item active">
         <img src="background1.jpg" alt="First slide">
         <div class="carousel-caption">
@@ -88,17 +95,10 @@
         </div>
       </div>
     </div>
-    </header>
-
-    <div class="container page-container">
-      <div class="home-page-header">
-      </div>
-
-    </div><!-- /.container -->
   </div>
 
   <!-- Section About -->
-  <div class="about-section">
+  <div class="about-section section">
     <div class="container">
       <h2>Tentang Kami</h2>
       <div class="row">
@@ -118,13 +118,12 @@
           <h4>Hasil Terbaik</h4>
           <p>Kami tidak hanya mengambil foto, kami menciptakan karya seni yang dapat dikenang seumur hidup.</p>
         </div>
-
       </div>
     </div>
   </div>
 
   <!-- Section Services -->
-  <div class="services-section">
+  <div class="services-section section">
     <div class="container">
       <h2>Layanan Kami</h2>
       <div class="row">
@@ -148,7 +147,7 @@
   </div>
 
   <!-- Section Testimonial -->
-  <div class="testimonial-section">
+  <div class="testimonial-section section">
     <div class="container">
       <h2>Apa Kata Pelanggan</h2>
       <div class="row">
@@ -174,68 +173,19 @@
     </div>
   </div>
 
-  <!-- Section Booking -->
-  <div class="booking-section">
-    <div class="container text-center">
-      <h2>Ingin Memesan Fotografer?</h2>
-      <p>Pilih fotografer profesional kami untuk momen spesial Anda.</p>
-      <a href="blog.html" class="btn btn-primary btn-lg">Booking Sekarang</a>
-    </div>
-  </div>
-  <!-- Section Contact -->
-  <div class="contact-section">
-    <div class="container">
-      <h2>Hubungi Kami</h2>
-      <form>
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Nama Anda" required>
-        </div>
-        <div class="form-group">
-          <input type="email" class="form-control" placeholder="Email" required>
-        </div>
-        <div class="form-group">
-          <textarea class="form-control" placeholder="Pesan Anda" rows="5" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Kirim Pesan</button>
-      </form>
-    </div>
-  </div>
-
-  <style>
-    .booking-btn {
-      margin-top: 20px;
-      padding: 12px 30px;
-      font-size: 18px;
-      background-color: #007bff;
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      text-transform: uppercase;
-      transition: background-color 0.3s ease;
-    }
-
-    .booking-btn:hover {
-      background-color: #0056b3;
-    }
-  </style>
-
-  <footer>
-    <p>
-      Dibuat oleh <i class="fa fa-heart"></i>
-      <a target="_blank" href="https://florin-pop.com">Depasaa</a>
-      - Desain oleh
-      <a target="_blank" href="https://dribbble.com/shots/6276930-Profile-Card-UI-Design">Depasaa</a>
-    </p>
-  </footer>
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script src="dist/js/jasny-bootstrap.min.js"></script>
   <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <script>
     $('.carousel').carousel({
       interval: 6000 //changes the speed
-    })
+    });
   </script>
+  <script>
+  function confirmLogout() {
+    return confirm("Apakah Anda yakin ingin keluar?");
+  }
+</script>
 </body>
 
 </html>
