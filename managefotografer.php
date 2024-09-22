@@ -40,8 +40,18 @@ if (isset($_POST['delete'])) {
     exit();
 }
 
-// Mengambil data pengguna dari database
-$stmt = $conn->prepare("SELECT id, name, email, role FROM users");
+// Mengambil data jumlah user dari database
+$stmtUserCount = $conn->prepare("SELECT COUNT(*) AS user_count FROM users");
+$stmtUserCount->execute();
+$userCount = $stmtUserCount->fetch(PDO::FETCH_ASSOC)['user_count'];
+
+// Mengambil data jumlah fotografer dari database
+$stmtFotograferCount = $conn->prepare("SELECT COUNT(*) AS fotografer_count FROM users WHERE role = 'fotografer'");
+$stmtFotograferCount->execute();
+$fotograferCount = $stmtFotograferCount->fetch(PDO::FETCH_ASSOC)['fotografer_count'];
+
+// Mengambil data user dari database
+$stmt = $conn->prepare("SELECT id, name, email, role FROM users ORDER BY id ASC");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -58,22 +68,28 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Admin Panel - FotoMemori</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link href="dist/css/jasny-bootstrap.min.css" rel="stylesheet">
-    <link href="http://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/navmenu-reveal.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-
+    <link href="dist/css/jasny-bootstraps.min.css" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+  <link href="css/bootstrapss.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Custom styles for this template -->
+  <link href="css/navmenu-reveals.css" rel="stylesheet">
+  <link href="css/styless.css" rel="stylesheet">
     <style>
         /* CSS tambahan untuk centering */
-        .table td, .table th {
-            text-align: center; /* Mengatur text-align ke center */
-            vertical-align: middle; /* Untuk vertikal align di tengah */
+        .table td,
+        .table th {
+            text-align: center;
+            /* Mengatur text-align ke center */
+            vertical-align: middle;
+            /* Untuk vertikal align di tengah */
         }
+
         .panel-body {
-            text-align: center; /* Center text dalam panel */
+            text-align: center;
+            /* Center text dalam panel */
         }
+
         /* Responsive adjustments */
         .table-responsive {
             margin-bottom: 20px;
@@ -82,31 +98,22 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
-    <div class="bar">
-        <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-recalc="false" data-target=".navmenu" data-canvas=".canvas">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
+    <div class="navmenu navmenu-default navmenu-fixed-left in">
+    <ul class="nav navmenu-nav">
+    <li><a href="adminpanel.php"><i class="fa fa-home nav-icon"></i> Dashboard</a></li>
+      <li><a href="manageuser.php"><i class="fa fa-image nav-icon"></i> Manage User</a></li>
+      <li><a href="managefotografer.php"><i class="fa fa-camera nav-icon"></i> Manage Fotografer</a></li>
+        <li><a href="logout.php" onclick="return confirmLogout();"><i class="fa fa-sign-out-alt nav-icon"></i> Logout</a></li>
+    </ul>
+    <a class="navmenu-brand" href="#"><img src="LogoFotoMemoriRevTransparant.png" width="160"></a>
+    <div class="social">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
     </div>
 
-    <div class="navmenu navmenu-default navmenu-fixed-left">
-        <ul class="nav navmenu-nav">
-            <li><a href="adminpanel.php">Dashboard</a></li>
-            <li><a href="manageuser.php">Manage User</a></li>
-            <li><a href="managefotografer.php">Manage Fotografer</a></li>
-            <li><a href="pendapatan.html">Pendapatan</a></li>
-            <li><a href="managecontact.php">Masukan</a></li>
-            <li><a href="logout.html">Logout</a></li>
-        </ul>
-        <a class="navmenu-brand" href="#"><img src="LogoFotoMemoriRevTransparant.png" width="160"></a>
-        <div class="social">
-            <a href="#"><i class="fa fa-facebook"></i></a>
-            <a href="#"><i class="fa fa-instagram"></i></a>
-            <a href="#"><i class="fa fa-youtube"></i></a>
-        </div>
-        <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
-    </div>
+    <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
+  </div>
 
     <div class="canvas">
         <div class="container-fluid">
@@ -122,7 +129,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <h3 class="panel-title">Jumlah User</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <h1><?php echo count($users); ?></h1> <!-- Example number -->
+                                <h1><?php echo $userCount; ?></h1>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +149,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <h3 class="panel-title">Pendapatan</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <h1>$0</h1> <!-- Example number -->
+                                <h1>$0</h1> <!-- Contoh pendapatan, sesuaikan sesuai data -->   
                                 </div>
                             </div>
                         </div>

@@ -22,7 +22,7 @@ session_start(); // Mulai sesi
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <!-- Custom styles for this template -->
   <link href="css/navmenu-reveals.css" rel="stylesheet">
-  <link href="css/stylesss.css" rel="stylesheet">
+  <link href="css/styless.css" rel="stylesheet">
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>

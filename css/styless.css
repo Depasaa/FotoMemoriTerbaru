@@ -118,7 +118,7 @@ li.category-item a {
 }
 
 li.category-item a:hover {
-  color: #337ab7;
+  color: #f0f0f0;
 }
 
 /* ----------------------------------------------------
@@ -511,7 +511,7 @@ textarea#message {
 }
 
 h2 {
-  color: #337ab7;
+  color: #f0f0f0;
   text-align: center;
   margin-bottom: 30px;
 }
@@ -534,7 +534,7 @@ h2 {
 
 .service-box i,
 .testimonial-item i {
-  color: #337ab7;
+  color: #f0f0f0;
   margin-bottom: 10px;
 }
 
@@ -553,7 +553,7 @@ h2 {
   text-align: center;
   font-size: 32px;
   margin-bottom: 40px;
-  color: #337ab7;
+  color: #f0f0f0;
 }
 
 .testimonial-box {
@@ -585,7 +585,7 @@ h2 {
 
 .prev-btn,
 .next-btn {
-  background-color: #337ab7;
+  background-color: #f0f0f0;
   border: none;
   padding: 10px;
   cursor: pointer;
@@ -607,7 +607,7 @@ h2 {
 }
 
 .contact-section .btn-primary {
-  background-color:#337ab7;
+  background-color:#f0f0f0;
   border: none;
 }
 

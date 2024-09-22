@@ -35,13 +35,13 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Admin Panel - FotoMemori</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link href="dist/css/jasny-bootstrap.min.css" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/navmenu-reveal.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-
+    <link href="dist/css/jasny-bootstraps.min.css" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+  <link href="css/bootstrapss.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Custom styles for this template -->
+  <link href="css/navmenu-reveals.css" rel="stylesheet">
+  <link href="css/styless.css" rel="stylesheet">
     <style>
         /* CSS tambahan untuk centering */
         .table td,
@@ -65,33 +65,22 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
-    <div class="bar">
-        <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-recalc="false" data-target=".navmenu"
-            data-canvas=".canvas">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
+    <div class="navmenu navmenu-default navmenu-fixed-left in">
+    <ul class="nav navmenu-nav">
+      <li><a href="adminpanel.php"><i class="fa fa-home nav-icon"></i> Dashboard</a></li>
+      <li><a href="manageuser.php"><i class="fa fa-image nav-icon"></i> Manage User</a></li>
+      <li><a href="managefotografer.php"><i class="fa fa-camera nav-icon"></i> Manage Fotografer</a></li>
+        <li><a href="logout.php" onclick="return confirmLogout();"><i class="fa fa-sign-out-alt nav-icon"></i> Logout</a></li>
+    </ul>
+    <a class="navmenu-brand" href="#"><img src="LogoFotoMemoriRevTransparant.png" width="160"></a>
+    <div class="social">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
     </div>
 
-    <div class="navmenu navmenu-default navmenu-fixed-left">
-        <ul class="nav navmenu-nav">
-            <li><a href="adminpanel.php">Dashboard</a></li>
-            <li><a href="manageuser.php">Manage User</a></li>
-            <li><a href="managefotografer.php">Manage Fotografer</a></li>
-            <li><a href="pendapatan.html">Pendapatan</a></li>
-            <li><a href="masukan.php">Masukan</a></li>
-            <li><a href="logout.html">Logout</a></li>
-        </ul>
-        <a class="navmenu-brand" href="#"><img src="LogoFotoMemoriRevTransparant.png" width="160"></a>
-        <div class="social">
-            <a href="#"><i class="fa fa-facebook"></i></a>
-            <a href="#"><i class="fa fa-instagram"></i></a>
-            <a href="#"><i class="fa fa-youtube"></i></a>
-        </div>
-        <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
-    </div>
-
+    <div class="copyright-text">©Copyright <a href="https://themewagon.com/"> Depasaa</a> 2024</div>
+  </div>
     <div class="canvas">
         <div class="container-fluid">
             <div class="row">

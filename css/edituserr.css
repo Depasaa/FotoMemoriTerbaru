@@ -24,7 +24,7 @@ body {
 }
 
 .container > h1 {
-    color: #337ab7; !important;
+    color: #f0f0f0; !important;
     animation: fadeIn 1.2s ease-in-out;
 }
 
@@ -89,11 +89,11 @@ body {
 }
 
 .alert-success {
-    background-color: #337ab7;
+    background-color: #f0f0f0;
 }
 
 .alert-error {
-    background-color: #337ab7;
+    background-color: #f0f0f0;
 }
 
 .card-container {
@@ -135,7 +135,7 @@ body {
 
 .card-profile h1 {
     font-size: 22px;
-    color: #fff;
+    color: #f0f0f0;
     margin-bottom: 10px;
 }
 
@@ -178,7 +178,7 @@ body {
 }
 
 .skills ul li span {
-    color: #337ab7;
+    color: #f0f0f0;
     font-weight: bold;
     font-size: 16px;
     letter-spacing: 1px;
@@ -187,17 +187,17 @@ body {
 }
 
 .skills ul li:hover span {
-    color: #337ab7;
+    color: #f0f0f0;
 }
 
 .container > h1 {
     text-align: center;
-    color: #337ab7;
+    color: #f0f0f0;
     font-size: 32px;
     margin-bottom: 30px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    background: linear-gradient(to right,#337ab7, #337ab7);
+    background: linear-gradient(to right,#f0f0f0, #f0f0f0);
     -webkit-background-clip: text;
     color: transparent;
 }
@@ -234,7 +234,7 @@ body {
 }
 
 .buttons button {
-    background-color: #337ab7;
+    background-color: #1e1e1e;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -245,5 +245,5 @@ body {
 }
 
 .buttons button:hover {
-    background-color: #337ab7;
+    background-color: #1e1e1e;
 }

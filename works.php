@@ -22,7 +22,7 @@ session_start(); // Mulai sesi
   <link href="css/bootstrapss.min.css" rel="stylesheet">
   <!-- Custom styles for this template -->
   <link href="css/navmenu-reveals.css" rel="stylesheet">
-  <link href="css/stylesss.css" rel="stylesheet">
+  <link href="css/styless.css" rel="stylesheet">
   <link href="css/full-slider.css" rel="stylesheet">
   <link href="css/Icomoon/style.css" rel="stylesheet" type="text/css" />
   <link href="css/animated-masonry-gallery.css" rel="stylesheet" type="text/css" />

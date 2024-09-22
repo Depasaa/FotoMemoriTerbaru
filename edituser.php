@@ -65,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     <link href="css/bootstrapss.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="css/navmenu-reveals.css" rel="stylesheet">
-    <link href="css/stylesss.css" rel="stylesheet">
-    <link href="css/edituserrr.css" rel="stylesheet" type="text/css" />
+    <link href="css/styless.css" rel="stylesheet">
+    <link href="css/edituserr.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>

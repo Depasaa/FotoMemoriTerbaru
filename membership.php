@@ -1,5 +1,5 @@
 <?php
-session_start(); // Mulai sesi
+session_start(); // Start session
 ?>
 
 <!DOCTYPE html>
@@ -18,60 +18,70 @@ session_start(); // Mulai sesi
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Custom styles for this template -->
     <link href="css/navmenu-reveals.css" rel="stylesheet">
-    <link href="css/stylesss.css" rel="stylesheet">
-    
+    <link href="css/styless.css" rel="stylesheet">
+
     <style>
-        .card {
-            background-color: #1e1e1e;
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            margin: 0 auto; /* Center the card */
-        }
-        .membership-option {
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: left; /* Align text to left */
-            transition: transform 0.2s, border-color 0.2s;
-            margin: 10px auto; /* Center the membership option */
-            max-width: 250px; /* Limit width for better appearance */
-            color: #f0f0f0; /* Color for membership option text */
-        }
-        .membership-option:hover {
-            transform: scale(1.05);
-        }
-        .membership-option.active {
-            border-color: #1db954;
-        }
-        .card-header h2,
-        .membership-option h5,
-        .rules-title {
-            color: #1db954; /* Bright color for headings */
-            text-align: left; /* Align text to left */
-        }
-        label {
-            color: #1db954; /* Bright color for labels */
-        }
-        #paymentSection {
-            display: none;
-            margin-top: 20px;
-            background-color: #282828;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .nav-icon {
-            margin-right: 5px;
-        }
-    </style>
+    body {
+        background-color: #121212;
+        color: #f0f0f0;
+    }
+    .card {
+        background-color: #1e1e1e;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        margin: 20px auto; /* Center the card */
+        max-width: 800px; /* Lebarkan card */
+        padding: 20px; /* Tambahkan padding untuk isi card */
+        opacity: 0; /* Mulai dengan opacity 0 */
+        transform: translateY(-50px); /* Mulai dari atas */
+        transition: opacity 2.5s ease, transform 2.5s ease; /* Ubah durasi transisi menjadi 2,5 detik */
+    }
+    .card.visible {
+        opacity: 1; /* Menjadi terlihat */
+        transform: translateY(0); /* Pindah ke posisi normal */
+    }
+    .membership-option {
+        cursor: pointer;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.2s, border-color 0.2s;
+        margin: 10px 0; /* Vertical spacing */
+        background-color: #282828;
+        color: #f0f0f0;
+    }
+    .membership-option:hover {
+        transform: scale(1.05);
+    }
+    .membership-option.active {
+        border-color: #1db954;
+    }
+    .rules-title, .form-check-label {
+        color: #1db954; /* Bright color for headings */
+    }
+    #paymentSection {
+        display: none;
+        margin-top: 20px;
+        background-color: #282828;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .nav-icon {
+        margin-right: 5px;
+    }
+</style>
+
+
 </head>
 
 <body>
 <div class="canvas gallery"><br>
-    <h1 class="blog-post-title text-center">Membership</h1>
+    <h1 class="blog-post-title text-center" id="membershipTitle">Membership</h1>
     <span class="title-divider"></span>
 </div>
+
     <div class="navmenu navmenu-default navmenu-fixed-left in">
         <ul class="nav navmenu-nav">
             <li><a href="index.php"><i class="fa fa-home nav-icon"></i> Beranda</a></li>
@@ -95,32 +105,37 @@ session_start(); // Mulai sesi
     </div>
 
     <div class="container mt-5">
-        <div class="card" style="max-width: 600px;">
+        <div class="card" id="membershipCard">
             <div class="card-body">
-                <form id="membershipForm">
+                <div class="membership-option" data-value="basic">
+                    <h5>Permanent Membership</h5>
+                    <p>Dapat mengakses semua fitur Fotografer.</p>
+                </div>
+
+                <form id="membershipForm" class="mt-4">
                     <div class="form-group">
-                        <label for="fullName">Full Name</label>
-                        <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required>
+                        <label for="fullName">Nama Lengkap</label>
+                        <input type="text" class="form-control" id="fullName" placeholder="Masukan nama lengkap" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Masukan email" required>
                     </div>
                     <div class="form-group">
-                        <label for="phoneNumber">Phone Number</label>
-                        <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter your phone number" required>
+                        <label for="phoneNumber">Nomor Handphone</label>
+                        <input type="tel" class="form-control" id="phoneNumber" placeholder="Masukan nomor handphone" required>
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+                        <input type="text" class="form-control" id="username" placeholder="Masukan username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                        <input type="password" class="form-control" id="password" placeholder="Masukan password" required>
                     </div>
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" required>
                     </div>
 
                     <div id="paymentSection">
@@ -168,36 +183,30 @@ session_start(); // Mulai sesi
             </div>
         </div>
     </div>
-    
-    <script>
-        function confirmLogout() {
-            return confirm("Apakah Anda yakin ingin keluar?");
-        }
 
-        $(document).ready(function() {
-            $('.membership-option').on('click', function() {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Menampilkan card dengan animasi
+            $('#membershipCard').addClass('visible');
+
+            // Menangani pilihan membership
+            $('.membership-option').on('click', function () {
                 $('.membership-option').removeClass('active');
                 $(this).addClass('active');
-                $('#paymentSection').show(); // Show payment section
+                $('#paymentSection').show(); // Tampilkan section pembayaran
             });
 
-            $('#paymentMethod').on('change', function() {
+            // Menangani pilihan metode pembayaran
+            $('#paymentMethod').on('change', function () {
                 if ($(this).val() === 'creditCard') {
                     $('#cardDetails').show();
                 } else {
                     $('#cardDetails').hide();
                 }
             });
-
-            $('#membershipForm').on('submit', function (e) {
-                e.preventDefault();
-                alert('Membership registration successful!');
-                // Here, you can add the AJAX call to send the form data to the server.
-            });
         });
     </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
 </html>

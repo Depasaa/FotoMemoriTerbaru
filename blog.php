@@ -25,7 +25,7 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link href="css/bootstrapss.min.css" rel="stylesheet">
   <!-- Custom styles for this template -->
   <link href="css/navmenu-reveals.css" rel="stylesheet">
-  <link href="css/stylesss.css" rel="stylesheet">
+  <link href="css/styless.css" rel="stylesheet">
   <link href="css/full-slider.css" rel="stylesheet">
   <link href="css/Icomoon/style.css" rel="stylesheet" type="text/css" />
   <link href="css/animated-masonry-gallery.css" rel="stylesheet" type="text/css" />
@@ -42,17 +42,25 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     .card {
-      background: #fff;
+      background: #1e1e1e;
       margin-bottom: 30px;
       transition: .5s;
       border: 0;
       border-radius: .1875rem;
       box-shadow: none;
+      opacity: 0; /* Mulai dengan opacity 0 */
+      transform: translateY(-50px); /* Mulai dari atas */
+      transition: opacity 2.5s ease, transform 2.5s ease; /* Transisi 2,5 detik */
+    }
+
+    .card.visible {
+      opacity: 1; /* Menjadi terlihat */
+      transform: translateY(0); /* Pindah ke posisi normal */
     }
 
     .card .body {
       font-size: 14px;
-      color: #424242;
+      color: #f0f0f0;
       padding: 20px;
       font-weight: 400;
     }
@@ -65,21 +73,21 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     .container-card {
-      max-width: 1200px;
+      max-width: 90%;
       padding-top: 30px;
+      margin: 0 auto;
     }
 
-    .card-items  {
-     display: grid;
-     grid-template-columns: repeat(4,1fr);
-
+    .card-items {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
     }
 
     /* Mengatasi overflow layar */
     .overflow-hidden {
       overflow-x: hidden;
     }
-
   </style>
 </head>
 
@@ -114,8 +122,8 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="canvas col-md-12">
     <div class="container-card">
         <div class="card-items">
-            <?php foreach ($photographers as $index => $photographer): ?>
-                <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-4">
+            <?php foreach ($photographers as $photographer): ?>
+                <div class="col-lg-10 col-md-4 col-sm-6 col-12 mb-4">
                     <div class="card profile-header text-center">
                         <div class="body">
                             <div class="profile-image"> 
@@ -130,9 +138,6 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                 </div>
-                <?php if (($index + 1) % 4 == 0): ?>
-                    <div class="w-100 d-none d-lg-block"></div> <!-- Pastikan 4 konten per baris -->
-                <?php endif; ?>
             <?php endforeach; ?>
         </div>
     </div>
@@ -145,6 +150,26 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     function confirmLogout() {
       return confirm("Apakah Anda yakin ingin keluar?");
     }
+
+    // Menggunakan Intersection Observer untuk animasi saat scroll
+    $(document).ready(function() {
+      const cards = document.querySelectorAll('.card');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible'); // Tambahkan kelas 'visible' saat card terlihat
+            observer.unobserve(entry.target); // Hentikan pengamatan setelah card terlihat
+          }
+        });
+      }, {
+        threshold: 0.1 // 10% dari card terlihat sebelum memicu animasi
+      });
+
+      cards.forEach(card => {
+        observer.observe(card); // Mulai mengamati setiap card
+      });
+    });
   </script>
 </body>
 

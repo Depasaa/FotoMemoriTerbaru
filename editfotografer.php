@@ -50,22 +50,10 @@
         .carousel-button.right {
             right: 10px;
         }
-
-        /* Animasi muncul dari atas */
-        .fade-in {
-            opacity: 0; /* Mulai dengan opacity 0 */
-            transform: translateY(-30px); /* Pindah sedikit ke atas */
-            transition: opacity 2.5s ease, transform 2.5s ease; /* Ubah durasi menjadi 2.5 detik */
-        }
-
-        .fade-in.visible {
-            opacity: 1; /* Menjadi terlihat */
-            transform: translateY(0); /* Kembali ke posisi normal */
-        }
     </style>
 </head>
 <body>
-   <div class="container fade-in" id="fadeInContainer">
+   <div class="container" id="fadeInContainer">
         <div class="card-container">
             <span class="pro">FOTOGRAFER</span>
             <img class="round" src="https://randomuser.me/api/portraits/women/79.jpg" alt="user" />
@@ -73,8 +61,8 @@
             <h6>Fotografer</h6>
             <p>Fotografer Profesional <br /> Harga Murah tapi Kualitas tak Murahan </p>
             <div class="buttons">
-                <button class="primary">Order Sekarang</button>
-                <button class="primary">Feedback</button>
+                <button class="primary">Edit Profil</button>
+               
             </div>
             <div class="skills">
                 <h6>Skills</h6>
@@ -88,8 +76,11 @@
             </div>
         </div>
 
+    
+
+
         <!-- Portfolio Section -->
-        <div class="portfolio-gallery fade-in" id="portfolioGallery">
+        <div class="portfolio-gallery" id="portfolioGallery">
             <h2>Hasil Karya</h2>
             <div class="gallery-grid">
                 <img src="https://via.placeholder.com/400" alt="Work 1" class="work-img zoom-in">
@@ -110,7 +101,7 @@
     </footer>
 
     <script>
-        const fadeInElements = document.querySelectorAll('#fadeInContainer, .portfolio-gallery');
+        const fadeInElements = document.querySelectorAll('#fadeInContainer, #testimonialSection, #portfolioGallery');
 
         const options = {
             root: null,
@@ -120,15 +111,16 @@
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('visible'); // Tambahkan kelas 'visible' saat elemen terlihat
+                    entry.target.classList.add('visible');
                 } else {
-                    entry.target.classList.remove('visible'); // Hapus kelas jika elemen tidak terlihat
+                    entry.target.classList.remove('visible');
                 }
             });
         }, options);
 
         fadeInElements.forEach(element => {
-            observer.observe(element); // Mulai mengamati setiap elemen
+            element.classList.add('fade-in');
+            observer.observe(element);
         });
 
         let currentScroll = 0;
