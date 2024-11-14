@@ -1,7 +1,12 @@
 <?php
 session_start();
 require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database dengan variabel $conn
-// Include file koneksi database
+require_once 'vendor/autoload.php'; // Pastikan path ke autoload.php sesuai
+
+// Konfigurasi Midtrans
+\Midtrans\Config::$serverKey = 'SB-Mid-server-YRtF6v9UqDDfyW4LeOSther8';
+\Midtrans\Config::$clientKey = 'SB-Mid-client-Qvh1BNENrpm1dwOr';
+\Midtrans\Config::$isProduction = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Ambil data dari form
@@ -31,16 +36,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Menjalankan query
     if ($stmt->execute()) {
-        // Redirect ke halaman pembayaran atau halaman konfirmasi
-        header('Location: payment_page.php'); // Sesuaikan dengan halaman pembayaran
-        exit();
+        // Ambil ID dari record terakhir yang disisipkan
+        $membership_id = $conn->lastInsertId();
+
+        // Membuat transaksi Midtrans
+        $transaction_details = array(
+            'order_id' => 'ORDER-' . uniqid(),  // ID unik untuk setiap transaksi
+            'gross_amount' => $amount,
+        );
+
+        $customer_details = array(
+            'first_name' => $fullname,
+            'email' => $email,
+        );
+
+        $transaction = array(
+            'transaction_details' => $transaction_details,
+            'customer_details' => $customer_details,
+        );
+
+        try {
+            // Request ke Midtrans untuk membuat transaksi
+            $charge = \Midtrans\Snap::createTransaction($transaction);
+
+            // Redirect ke halaman pembayaran Midtrans
+            header('Location: ' . $charge->redirect_url);
+            exit();
+        } catch (Exception $e) {
+            echo "Terjadi kesalahan: " . $e->getMessage();
+            exit();
+        }
     } else {
         echo "Terjadi kesalahan saat mengajukan membership.";
     }
 }
 ?>
 
-?>
+
 
 <!DOCTYPE html>
 <html lang="zxx">
@@ -130,7 +162,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="col-lg-12">
                     <div class="bo-links">
                         <a href="./index.php"><i class="fa fa-home"></i> Beranda</a>
-                        <span>Profil User</span>
+                        <span>Membership</span>
                     </div>
                 </div>
             </div>
@@ -175,7 +207,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h4 class="text-success">Hanya Rp100.000 / seumur hidup</h4>
                         <p class="text-muted">Nikmati akses eksklusif secara permanen dengan harga terjangkau!</p>
                     </div>
-                    <form action="membership_submit.php" method="POST" class="membership-form">
+                    <form action="#" method="POST" class="membership-form">
                         <div class="form-group">
                             <label for="fullname">Nama Lengkap</label>
                             <input type="text" id="fullname" name="fullname" class="form-control" required>
@@ -203,7 +235,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 placeholder="Ceritakan sedikit tentang diri Anda dan gaya fotografi Anda"
                                 required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block mt-4">Ajukan Sekarang</button>
+                        <button id="checkoutButton" class="btn btn-primary btn-block mt-4">Ajukan Sekarang</button>
                     </form>
                 </div>
             </div>
@@ -314,7 +346,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 
 
+    <!--Modal Midtrans saat dipencet ajukan sekarang-->
 
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="SB-Mid-client-Qvh1BNENrpm1dwOr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.getElementById('checkoutButton').addEventListener('click', function () {
+            if ("<?= $_SESSION['snapToken'] ?>" === "") {
+                alert("Snap Token tidak ditemukan.");
+                return;
+            }
+            snap.pay("<?= $_SESSION['snapToken'] ?>", {
+                onSuccess: function (result) {
+                    $.ajax({
+                        url: 'simpan_transaksi.php',
+                        type: 'POST',
+                        data: {
+                            user_id: <?= $user_id ?>,
+                            order_id: result.order_id,
+                            gross_amount: result.gross_amount,
+                            payment_type: result.payment_type,
+                            transaction_status: result.transaction_status
+                        },
+                        success: function (response) {
+                            alert("Transaksi berhasil dan data disimpan ke database");
+                            console.log(response);
+                        },
+                        error: function () {
+                            alert("Gagal menyimpan transaksi. Silakan coba lagi.");
+                        }
+                    });
+                },
+                onPending: function (result) {
+                    alert("Waiting for payment confirmation!");
+                    console.log(result);
+                },
+                onError: function (result) {
+                    alert("Payment Error!");
+                    console.log(result);
+                }
+            });
+        });
+    </script>
+
+    <!--End modal midtrans cuy-->
 
     <!-- Footer Section Begin -->
     <footer class="footer-section">
