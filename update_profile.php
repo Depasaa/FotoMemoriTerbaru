@@ -11,6 +11,12 @@ if (!isset($_SESSION['user_id'])) {
 // Ambil ID pengguna yang sudah login
 $user_id = $_SESSION['user_id'];
 
+// Ambil data pengguna dari database
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = :id");
+$stmt->bindParam(':id', $user_id);
+$stmt->execute();
+$user = $stmt->fetch();
+
 // Periksa apakah form di-submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Ambil data dari form
@@ -27,6 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $statement->bindParam(':bio', $bio);
     $statement->bindParam(':id', $user_id);
     $statement->execute();
+
+    // Jika pengguna adalah fotografer, update keahlian mereka
+    if ($user['role'] === 'fotografer') {
+        // Ambil keahlian yang dipilih
+        $skills = isset($_POST['skills']) ? implode(',', $_POST['skills']) : '';
+
+        // Update keahlian fotografer di database
+        $stmt = $conn->prepare("UPDATE users SET skills = :skills WHERE id = :id");
+        $stmt->bindParam(':skills', $skills);
+        $stmt->bindParam(':id', $user_id); // Menggunakan $user_id karena sudah ada di session
+        $stmt->execute();
+    }
 
     // Redirect kembali ke halaman profil setelah berhasil
     header("Location: profiluser.php");

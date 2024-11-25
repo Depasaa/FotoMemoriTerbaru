@@ -2,7 +2,6 @@
 session_start();
 require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database dengan variabel $conn
 
-
 if (isset($_GET['id'])) {
     $fotografer_id = $_GET['id'];
 
@@ -12,13 +11,16 @@ if (isset($_GET['id'])) {
     $query->execute();
     $fotografer = $query->fetch(PDO::FETCH_ASSOC);
 
-    // Jika fotografer ditemukan, simpan data 
     if ($fotografer) {
+        // Simpan ID fotografer ke session
+        $_SESSION['fotografer_id'] = $fotografer_id;
+
+        // Ambil data fotografer
         $nama = htmlspecialchars($fotografer['name']);
         $profile_image = $fotografer['profiluser'];  // Sesuaikan dengan nama kolom yang benar
         $description = htmlspecialchars($fotografer['bio']); // Sesuaikan dengan nama kolom yang benar
 
-        // Query untuk mengambil gambar portofolio dari kolom img1 - img7
+        // Query untuk mengambil gambar portofolio
         $query_portfolio = $conn->prepare("SELECT img1, img2, img3, img4, img5, img6, img7 FROM portofolio WHERE idportofolio = :id");
         $query_portfolio->bindParam(':id', $fotografer_id, PDO::PARAM_INT);
         $query_portfolio->execute();
@@ -32,10 +34,6 @@ if (isset($_GET['id'])) {
     exit;
 }
 ?>
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="zxx">
@@ -88,7 +86,7 @@ if (isset($_GET['id'])) {
                         </a>
                     </div>
                     <nav class="nav-menu mobile-menu">
-                    <ul>
+                        <ul>
                             <li><a href="./index.php">Beranda</a></li>
                             <li class="active"><a href="./about.php">Tentang</a></li>
                             <li><a href="./services.php">Layanan</a></li>
@@ -99,7 +97,12 @@ if (isset($_GET['id'])) {
                                 <li><a href="./blog.php">Lens</a></li>
                                 <li><a href="#">Laman</a>
                                     <ul class="dropdown">
-                                        <li><a href="./membership.php">Membership</a></li>
+                                        <!-- Pengecekan role dan pengalihan link Membership -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'fotografer'): ?>
+                                            <li><a href="./membership_details.php">Membership</a></li>
+                                        <?php else: ?>
+                                            <li><a href="./membership.php">Membership</a></li>
+                                        <?php endif; ?>
                                         <li><a href="./portfolio-details.php">Detail Portofolio</a></li>
                                         <li><a href="./blog-details.php">Detail Blog</a></li>
                                     </ul>
@@ -133,7 +136,7 @@ if (isset($_GET['id'])) {
     </div>
     <!-- Breadcrumb End -->
 
-    <!-- Pricing Section Begin -->
+    <!-- Fotografer Profile Section Begin -->
     <section class="fotografer-profile-section spad">
         <div class="container">
             <div class="row">
@@ -145,55 +148,54 @@ if (isset($_GET['id'])) {
                                 alt="Fotografer Profile" class="img-fluid rounded-circle">
                         </div>
                         <div class="profile-info mt-4">
-                            <h3><?php echo $nama; ?></h3>
-                            <p><?php echo $description; ?></p>
+                            <h3><?php echo htmlspecialchars($fotografer['name']); ?></h3>
+                            <p><strong>Bio:</strong> <?php echo htmlspecialchars($fotografer['bio']); ?></p>
+                            <p><strong>Skill:</strong>
+                                <?php
+                                // Mengubah skills menjadi array dan menampilkan dalam bentuk list
+                                $skillsArray = explode(',', $fotografer['skills']);
+                                echo implode(', ', $skillsArray);
+                                ?>
+                            </p>
+                            <p><strong>Nomor Telepon:</strong> <?php echo htmlspecialchars($fotografer['phone']); ?></p>
                         </div>
                     </div>
-
                 </div>
                 <!-- Fotografer Profile End -->
 
                 <!-- Fotografer Portfolio Begin -->
-                <!-- Pricing Section Begin -->
-                <section class="fotografer-profile-section spad">
-                    <div class="container">
-                        <div class="row">
+                <div class="col-lg-8">
+                    <div class="fotografer-portfolio">
+                        <h4>Portofolio</h4>
+                        <div class="portfolio-gallery">
+                            <?php
+                            // Loop melalui kolom gambar jika ada gambar yang tersedia
+                            $portfolio_columns = ['img1', 'img2', 'img3', 'img4', 'img5', 'img6', 'img7'];
+                            $portfolio_empty = true; // Untuk mengecek apakah ada gambar yang ditampilkan
+                            
+                            foreach ($portfolio_columns as $column) {
+                                // Cek jika kolom gambar ada isinya, jika tidak, gunakan gambar default di folder uploads
+                                $image_url = !empty($portfolio_images[$column]) ? 'uploads/' . $portfolio_images[$column] : 'uploads/defaultprofil.jpg';
 
-                            <!-- Fotografer Portfolio Begin -->
-                            <div class="col-lg-8">
-                                <div class="fotografer-portfolio">
-                                    <h4>Portofolio</h4>
-                                    <div class="portfolio-gallery">
-                                        <?php
-                                        // Loop melalui kolom gambar jika ada gambar yang tersedia
-                                        $portfolio_columns = ['img1', 'img2', 'img3', 'img4', 'img5', 'img6', 'img7'];
-                                        $portfolio_empty = true; // Untuk mengecek apakah ada gambar yang ditampilkan
-                                        
-                                        foreach ($portfolio_columns as $column) {
-                                            // Cek jika kolom gambar ada isinya, jika tidak, gunakan gambar default di folder uploads
-                                            $image_url = !empty($portfolio_images[$column]) ? 'uploads/' . $portfolio_images[$column] : 'uploads/defaultprofil.jpg';
+                                echo '<div class="portfolio-item">';
+                                echo '<img src="' . htmlspecialchars($image_url) . '" alt="Portfolio Image" class="img-fluid">';
+                                echo '</div>';
+                                $portfolio_empty = false;
+                            }
 
-                                            echo '<div class="portfolio-item">';
-                                            echo '<img src="' . htmlspecialchars($image_url) . '" alt="Portfolio Image" class="img-fluid">';
-                                            echo '</div>';
-                                            $portfolio_empty = false;
-                                        }
-
-                                        if ($portfolio_empty) {
-                                            echo "<p>Tidak ada gambar portofolio yang tersedia.</p>";
-                                        }
-                                        ?>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Fotografer Portfolio End -->
+                            if ($portfolio_empty) {
+                                echo "<p>Tidak ada gambar portofolio yang tersedia.</p>";
+                            }
+                            ?>
                         </div>
                     </div>
-                </section>
-                <!-- Pricing Section End -->
-
+                </div>
                 <!-- Fotografer Portfolio End -->
+
+
+                <!-- Fotografer Profile Section End -->
+
+
 
                 <!-- CSS Customization -->
                 <style>
@@ -313,7 +315,6 @@ if (isset($_GET['id'])) {
                                         </select>
                                     </div>
                                 </div>
-                                <!-- Tambahan input pesan -->
                                 <div class="col-lg-12">
                                     <div class="form-group">
                                         <label for="pesan">Pesan untuk Fotografer:</label>
@@ -327,6 +328,7 @@ if (isset($_GET['id'])) {
                                 </div>
                             </div>
                         </form>
+
                     </div>
                 </div>
                 <!-- Order Section End -->

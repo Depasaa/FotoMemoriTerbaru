@@ -1,8 +1,32 @@
 <?php
+// Memulai session dan memastikan user sudah login
 session_start();
-require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database dengan variabel $conn
+include('koneksi.php'); // Pastikan file koneksi database sudah disertakan
 
+// Cek apakah pengguna sudah login
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php"); // Jika tidak login, redirect ke halaman login
+    exit();
+}
+
+$user_id = $_SESSION['user_id']; // Ambil user_id dari session
+
+// Query untuk mengambil data pengguna berdasarkan user_id
+$query = "SELECT * FROM users WHERE id = :user_id";
+$stmt = $conn->prepare($query);
+$stmt->bindParam(':user_id', $user_id);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($user) {
+    $name = $user['name'];
+    $email = $user['email'];
+    $role = $user['role']; // Mendapatkan role pengguna
+
+    // Tidak ada lagi pengambilan status membership dan tanggal bergabung
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="zxx">
@@ -91,13 +115,13 @@ require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database 
     <!-- Header End -->
 
     <!-- Breadcrumb Begin -->
-    <div class="breadcrumb-option spad">
+    <div class="breadcrumb-option">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="bo-links">
                         <a href="./index.php"><i class="fa fa-home"></i> Beranda</a>
-                        <span>Tentang</span>
+                        <span>Membership</span>
                     </div>
                 </div>
             </div>
@@ -105,167 +129,183 @@ require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database 
     </div>
     <!-- Breadcrumb End -->
 
-    <!-- About Section Begin -->
-    <section class="about-section">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-6 p-0">
-                    <div class="about-pic set-bg" data-setbg="img/about/about-pic.jpg">
-                        <a href="https://www.youtube.com/watch?v=hxADTEJalRw&list=WL&index=49&t=0s"
-                            class="play-btn video-popup"><i class="fa fa-play"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-6 p-0">
-                    <div class="about-text">
-                        <div class="section-title">
-                            <h2>Mengabadikan momen yang memikat hati Anda</h2>
-                            <p>Setiap momen berharga dalam hidup layak untuk diabadikan dengan sempurna. Kami hadir
-                                untuk menangkap emosi, kebahagiaan, dan keindahan di setiap detiknya. Dari acara penting
-                                hingga momen-momen sederhana yang penuh makna, tim fotografer profesional kami
-                                berkomitmen untuk menghadirkan hasil terbaik yang bisa dikenang selamanya. Biarkan kami
-                                menjadi bagian dari cerita Anda dan menciptakan kenangan visual yang memikat hati,
-                                sesuai dengan gaya dan kebutuhan Anda. Dengan lensa kami, setiap momen akan terlukis
-                                abadi.
-                            </p>
-                        </div>
-                        <div class="at-list">
-                            <div class="al-item">
-                                <div class="al-pic">
-                                    <img src="img/about/list-1.png" alt="">
-                                </div>
-                                <div class="al-text">
-                                    <h5>Profesionalisme</h5>
-                                    <p>Profesionalisme adalah prioritas kami. Para fotografer
-                                        berpengalaman kami siap memenuhi kebutuhan Anda dengan hasil terbaik dan
-                                        pelayanan yang ramah.</p>
-                                </div>
-                            </div>
-                            <div class="al-item">
-                                <div class="al-pic">
-                                    <img src="img/about/list-2.png" alt="">
-                                </div>
-                                <div class="al-text">
-                                    <h5>Pendekatan Khusus</h5>
-                                    <p>Kami percaya bahwa setiap klien unik. Kami mengutamakan pendekatan
-                                        individu untuk memahami kebutuhan dan harapan Anda, memastikan setiap sesi foto
-                                        disesuaikan dengan gaya dan kepribadian Anda.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="al-item">
-                                <div class="al-pic">
-                                    <img src="img/about/list-3.png" alt="">
-                                </div>
-                                <div class="al-text">
-                                    <h5>Jadwal Fleksibel</h5>
-                                    <p>Kami memahami pentingnya kenyamanan Anda. Dengan jadwal fleksibel,
-                                        kami siap menyesuaikan waktu sesi foto sesuai kebutuhan dan preferensi Anda,
-                                        memastikan pengalaman yang nyaman dan menyenangkan.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Membership Details Begin -->
+<div class="membership-details-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="section-title">Detail Membership Anda</h2>
+                <p class="membership-description">Lihat informasi lengkap tentang keanggotaan Anda dan keuntungan yang Anda dapatkan.</p>
             </div>
         </div>
-    </section>
-    <!-- About Section End -->
+        <div class="row">
+            <!-- Combined Membership Info and Benefits -->
+            <div class="col-lg-12">
+                <div class="membership-info-and-benefits card-equal-height">
+                    <?php if ($role == 'fotografer') { ?>
+                        <h4>Keanggotaan Seumur Hidup</h4>
+                        <p>Selamat! Anda telah memilih membership seumur hidup. Sekarang Anda memiliki status sebagai seorang fotografer, Anda akan terus mendapatkan semua keuntungan tanpa batasan waktu.</p>
 
-    <!-- Cta Section Begin -->
-    <section class="cta-section spad set-bg" data-setbg="img/cta-bg.jpg">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="cta-text">
-                        <h2>Ingin menjadi fotografer?</h2>
-                        <p>Jika Anda seorang fotografer berbakat yang ingin
-                            menunjukkan karya Anda dan mendapatkan kesempatan untuk bekerja dengan klien yang beragam,
-                            daftarkan diri Anda sekarang. Mari ciptakan momen-momen berharga bersama!</p>
-                        <a href="membership.php" class="primary-btn">Join Now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Cta Section End -->
+                        <h5>Keuntungan Membership</h5>
+                        <ul>
+                            <li>Menjangkau ribuan klien potensial di seluruh kota dan wilayah lain.</li>
+                            <li>Atur jadwal pemotretan Anda sesuai kebutuhan tanpa ada batasan.</li>
+                            <li>Dapatkan dukungan pemasaran dan konsultasi untuk karier fotografi Anda.</li>
+                        </ul>
 
-    <!-- Testimoial Section Begin -->
-    <section class="testimonial-section spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="section-title">
-                        <h2>Apa kata klien?</h2>
-                        <p>Dengarkan langsung testimonial dari klien kami yang puas dengan layanan yang
-                            kami tawarkan.</p>
-                    </div>
+                        <!-- Button for Ending Membership -->
+                        <?php if ($role == 'fotografer') ?>
+    <!-- Tombol Akhiri Membership -->
+    <button type="button" class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#confirmEndMembershipModal">
+        Akhiri Membership
+    </button>
+
+    <!-- Modal Konfirmasi -->
+    <div class="modal fade" id="confirmEndMembershipModal" tabindex="-1" aria-labelledby="confirmEndMembershipModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmEndMembershipModalLabel">Konfirmasi Penghentian Membership</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="testimonial-item">
-                        <div class="ti-author">
-                            <div class="ta-pic">
-                                <img src="img/testimonial/ta-1.jpg" alt="">
-                            </div>
-                            <div class="ta-text">
-                                <h5>ANDREW FILDER</h5>
-                                <span>@filder_muko</span>
-                            </div>
-                        </div>
-                        <p>FotoMemori menangkap momen spesial kami dengan sempurna! Hasilnya luar biasa dan timnya
-                            sangat profesional.</p>
-                    </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin mengakhiri membership Anda? Setelah mengakhiri, status Anda akan berubah menjadi pengguna biasa.
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="testimonial-item">
-                        <div class="ti-author">
-                            <div class="ta-pic">
-                                <img src="img/testimonial/ta-2.jpg" alt="">
-                            </div>
-                            <div class="ta-text">
-                                <h5>David Guetta</h5>
-                                <span>@filder_muko</span>
-                            </div>
-                        </div>
-                        <p>Saya sangat puas dengan layanan yang diberikan. Fotografernya ramah dan tahu cara membuat
-                            kami merasa nyaman di depan kamera!</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="testimonial-item">
-                        <div class="ti-author">
-                            <div class="ta-pic">
-                                <img src="img/testimonial/ta-3.jpg" alt="">
-                            </div>
-                            <div class="ta-text">
-                                <h5>Bebe Rexha</h5>
-                                <span>@filder_muko</span>
-                            </div>
-                        </div>
-                        <p>Kualitas foto yang dihasilkan melebihi ekspektasi saya. Terima kasih, FotoMemori, atas
-                            pengalaman yang tak terlupakan!</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="testimonial-item">
-                        <div class="ti-author">
-                            <div class="ta-pic">
-                                <img src="img/testimonial/ta-4.jpg" alt="">
-                            </div>
-                            <div class="ta-text">
-                                <h5>Adam Levine</h5>
-                                <span>@filder_muko</span>
-                            </div>
-                        </div>
-                        <p>Jadwal yang fleksibel dan pendekatan personal membuat seluruh proses menjadi menyenangkan.
-                            Saya pasti akan merekomendasikan!</p>
-                    </div>
+                <div class="modal-footer">
+                    <form method="POST" action="end_membership.php">
+                        <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+                        <button type="submit" class="btn btn-danger">Akhiri Membership</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- Testimonial Section End -->
+    </div>
+<?php } else { ?>
+    <p>Anda sekarang sudah bukan seorang fotografer. Silahkan login ulang dengan keluar/logout terlebih dahulu pada <a href="profiluser.php">akun</a> saat ini agar status membership anda diperbarui.</p>
+<?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal untuk Mengakhiri Membership -->
+<div class="modal fade" id="endMembershipModal" tabindex="-1" aria-labelledby="endMembershipModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="endMembershipModalLabel">Akhiri Membership</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin mengakhiri membership Anda? Semua keuntungan akan hilang setelah mengakhiri membership.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <form method="post" action="end_membership.php">
+                    <button type="submit" class="btn btn-danger">Akhiri Membership</button>
+                    <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Tambahkan Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- CSS untuk Konsistensi Desain -->
+<style>
+  /* Membership Section Styling */
+  .membership-details-section {
+      padding: 50px 0;
+      background-color: #ffffff;
+  }
+
+  .membership-details-section .section-title {
+      font-size: 32px;
+      color: #333;
+      margin-bottom: 20px;
+  }
+
+  .membership-details-section .membership-description {
+      font-size: 18px;
+      color: #777;
+      margin-bottom: 40px;
+  }
+
+  /* Combined Card Styling */
+  .membership-info-and-benefits {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      padding: 30px; 
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 0;
+  }
+
+  .membership-info-and-benefits h4, .membership-info-and-benefits h5 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+  }
+
+  .membership-info-and-benefits p, .membership-info-and-benefits ul li {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.6;
+  }
+
+  /* List Styling */
+  .membership-info-and-benefits ul {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 0;
+  }
+
+  .membership-info-and-benefits ul li {
+      margin-bottom: 15px;
+      padding-left: 20px;
+      position: relative;
+  }
+
+  .membership-info-and-benefits ul li::before {
+      content: "\2022";
+      position: absolute;
+      left: 0;
+      color: #4caf50;
+      font-size: 20px;
+      top: 0;
+  }
+
+  /* Tombol Akhiri Membership */
+  .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Equal Height for Cards */
+  .card-equal-height {
+      height: 100%;
+  }
+</style>
+
+
 
     <!-- Footer Section Begin -->
     <footer class="footer-section">

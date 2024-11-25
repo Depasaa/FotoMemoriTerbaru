@@ -1,76 +1,60 @@
 <?php
 session_start();
-require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database dengan variabel $conn
-require_once 'vendor/autoload.php'; // Pastikan path ke autoload.php sesuai
+require_once 'koneksi.php'; // Pastikan koneksi ke database
+require_once 'vendor/autoload.php'; // Path autoload Midtrans
 
 // Konfigurasi Midtrans
 \Midtrans\Config::$serverKey = 'SB-Mid-server-YRtF6v9UqDDfyW4LeOSther8';
-\Midtrans\Config::$clientKey = 'SB-Mid-client-Qvh1BNENrpm1dwOr';
 \Midtrans\Config::$isProduction = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Ambil data dari form
-    $user_id = $_SESSION['user_id']; // Pastikan user sudah login dan user_id disimpan di session
+    $user_id = $_SESSION['user_id']; // Pastikan user_id ada di session
     $fullname = $_POST['fullname'];
     $email = $_POST['email'];
     $portfolio_url = $_POST['portfolio'];
-    $experience_level = $_POST['experience'];
     $description = $_POST['description'];
-    $amount = 100000.00; // Jumlah tetap untuk pembayaran seumur hidup
+    $amount = 100000.00;
 
-    // Query untuk memasukkan data ke dalam tabel tb_membership
-    $sql = "INSERT INTO tb_membership (user_id, fullname, email, portfolio_url, experience_level, description, amount, payment_status)
-            VALUES (:user_id, :fullname, :email, :portfolio_url, :experience_level, :description, :amount, 'Pending')";
-
-    // Menyiapkan statement
+    // Simpan data ke database tanpa payment_status
+    $sql = "INSERT INTO tb_membership (user_id, fullname, email, portfolio_url, description, amount)
+            VALUES (:user_id, :fullname, :email, :portfolio_url, :description, :amount)";
     $stmt = $conn->prepare($sql);
-
-    // Mengikat parameter
     $stmt->bindParam(':user_id', $user_id);
     $stmt->bindParam(':fullname', $fullname);
     $stmt->bindParam(':email', $email);
     $stmt->bindParam(':portfolio_url', $portfolio_url);
-    $stmt->bindParam(':experience_level', $experience_level);
     $stmt->bindParam(':description', $description);
     $stmt->bindParam(':amount', $amount);
 
-    // Menjalankan query
     if ($stmt->execute()) {
-        // Ambil ID dari record terakhir yang disisipkan
-        $membership_id = $conn->lastInsertId();
+        $membership_id = $conn->lastInsertId(); // Ambil ID terakhir
 
         // Membuat transaksi Midtrans
-        $transaction_details = array(
-            'order_id' => 'ORDER-' . uniqid(),  // ID unik untuk setiap transaksi
-            'gross_amount' => $amount,
-        );
-
-        $customer_details = array(
-            'first_name' => $fullname,
-            'email' => $email,
-        );
-
-        $transaction = array(
-            'transaction_details' => $transaction_details,
-            'customer_details' => $customer_details,
-        );
+        $transaction = [
+            'transaction_details' => [
+                'order_id' => 'ORDER-' . $membership_id,
+                'gross_amount' => $amount,
+            ],
+            'customer_details' => [
+                'first_name' => $fullname,
+                'email' => $email,
+            ],
+        ];
 
         try {
-            // Request ke Midtrans untuk membuat transaksi
-            $charge = \Midtrans\Snap::createTransaction($transaction);
-
-            // Redirect ke halaman pembayaran Midtrans
-            header('Location: ' . $charge->redirect_url);
+            $snapToken = \Midtrans\Snap::getSnapToken($transaction);
+            echo json_encode(['status' => 'success', 'snapToken' => $snapToken]);
             exit();
         } catch (Exception $e) {
-            echo "Terjadi kesalahan: " . $e->getMessage();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
             exit();
         }
     } else {
-        echo "Terjadi kesalahan saat mengajukan membership.";
+        echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan ke database.']);
     }
 }
 ?>
+
 
 
 
@@ -125,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </a>
                     </div>
                     <nav class="nav-menu mobile-menu">
-                        <ul>
+                    <ul>
                             <li><a href="./index.php">Beranda</a></li>
                             <li class="active"><a href="./about.php">Tentang</a></li>
                             <li><a href="./services.php">Layanan</a></li>
@@ -136,7 +120,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <li><a href="./blog.php">Lens</a></li>
                                 <li><a href="#">Laman</a>
                                     <ul class="dropdown">
-                                        <li><a href="./membership.php">Membership</a></li>
+                                        <!-- Pengecekan role dan pengalihan link Membership -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'fotografer'): ?>
+                                            <li><a href="./membership_details.php">Membership</a></li>
+                                        <?php else: ?>
+                                            <li><a href="./membership.php">Membership</a></li>
+                                        <?php endif; ?>
                                         <li><a href="./portfolio-details.php">Detail Portofolio</a></li>
                                         <li><a href="./blog-details.php">Detail Blog</a></li>
                                     </ul>
@@ -147,6 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <li><a href="login.php">Login</a></li>
                             <?php endif; ?>
                         </ul>
+
                     </nav>
                     <div id="mobile-menu-wrap"></div>
                 </div>
@@ -207,7 +197,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h4 class="text-success">Hanya Rp100.000 / seumur hidup</h4>
                         <p class="text-muted">Nikmati akses eksklusif secara permanen dengan harga terjangkau!</p>
                     </div>
-                    <form action="#" method="POST" class="membership-form">
+                    <form id="membershipForm" method="POST" class="membership-form">
                         <div class="form-group">
                             <label for="fullname">Nama Lengkap</label>
                             <input type="text" id="fullname" name="fullname" class="form-control" required>
@@ -221,21 +211,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <input type="url" id="portfolio" name="portfolio" class="form-control"
                                 placeholder="https://contohportofolio.com" required>
                         </div>
-                        <div class="form-group">
-                            <label for="experience">Pengalaman Fotografi</label>
-                            <select id="experience" name="experience" class="form-control">
-                                <option value="beginner">Pemula (0-1 tahun)</option>
-                                <option value="intermediate">Menengah (1-3 tahun)</option>
-                                <option value="advanced">Lanjutan (3+ tahun)</option>
-                            </select>
-                        </div>
+                       
                         <div class="form-group">
                             <label for="description">Deskripsi Singkat</label>
                             <textarea id="description" name="description" class="form-control" rows="3"
                                 placeholder="Ceritakan sedikit tentang diri Anda dan gaya fotografi Anda"
                                 required></textarea>
                         </div>
-                        <button id="checkoutButton" class="btn btn-primary btn-block mt-4">Ajukan Sekarang</button>
+                        <button type="button" id="checkoutButton" class="btn btn-primary btn-block mt-4">Ajukan
+                            Sekarang</button>
+                    </form>
+                    <form action="proses_role.php" method="post" id="handleback">
+                        <input type="hidden" name="json" id="json_callback">
                     </form>
                 </div>
             </div>
@@ -346,51 +333,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 
 
-    <!--Modal Midtrans saat dipencet ajukan sekarang-->
-
+    <!-- Script Midtrans -->
     <script src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="SB-Mid-client-Qvh1BNENrpm1dwOr"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         document.getElementById('checkoutButton').addEventListener('click', function () {
-            if ("<?= $_SESSION['snapToken'] ?>" === "") {
-                alert("Snap Token tidak ditemukan.");
-                return;
-            }
-            snap.pay("<?= $_SESSION['snapToken'] ?>", {
-                onSuccess: function (result) {
-                    $.ajax({
-                        url: 'simpan_transaksi.php',
-                        type: 'POST',
-                        data: {
-                            user_id: <?= $user_id ?>,
-                            order_id: result.order_id,
-                            gross_amount: result.gross_amount,
-                            payment_type: result.payment_type,
-                            transaction_status: result.transaction_status
-                        },
-                        success: function (response) {
-                            alert("Transaksi berhasil dan data disimpan ke database");
-                            console.log(response);
-                        },
-                        error: function () {
-                            alert("Gagal menyimpan transaksi. Silakan coba lagi.");
-                        }
-                    });
+            const formData = $("#membershipForm").serialize();
+            $.ajax({
+                url: 'membership.php',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        snap.pay(response.snapToken, {
+                            onSuccess: function (result) {
+                                document.getElementById('json_callback').value = JSON.stringify(payload);
+                                document.getElementById('handleback').submit();
+                            },
+                            onPending: function (result) {
+                                alert('Menunggu konfirmasi pembayaran!');
+                                console.log(result);
+                            },
+                            onError: function (result) {
+                                alert('Pembayaran gagal!');
+                                console.log(result);
+                            }
+                        });
+                    } else {
+                        alert(response.message || 'Terjadi kesalahan.');
+                    }
                 },
-                onPending: function (result) {
-                    alert("Waiting for payment confirmation!");
-                    console.log(result);
-                },
-                onError: function (result) {
-                    alert("Payment Error!");
-                    console.log(result);
+                error: function () {
+                    alert('Gagal memproses permintaan. Silakan coba lagi.');
                 }
             });
         });
     </script>
-
-    <!--End modal midtrans cuy-->
 
     <!-- Footer Section Begin -->
     <footer class="footer-section">

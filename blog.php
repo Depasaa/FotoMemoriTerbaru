@@ -154,7 +154,7 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </a>
                     </div>
                     <nav class="nav-menu mobile-menu">
-                        <ul>
+                    <ul>
                             <li><a href="./index.php">Beranda</a></li>
                             <li class="active"><a href="./about.php">Tentang</a></li>
                             <li><a href="./services.php">Layanan</a></li>
@@ -165,7 +165,12 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <li><a href="./blog.php">Lens</a></li>
                                 <li><a href="#">Laman</a>
                                     <ul class="dropdown">
-                                        <li><a href="./membership.php">Membership</a></li>
+                                        <!-- Pengecekan role dan pengalihan link Membership -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'fotografer'): ?>
+                                            <li><a href="./membership_details.php">Membership</a></li>
+                                        <?php else: ?>
+                                            <li><a href="./membership.php">Membership</a></li>
+                                        <?php endif; ?>
                                         <li><a href="./portfolio-details.php">Detail Portofolio</a></li>
                                         <li><a href="./blog-details.php">Detail Blog</a></li>
                                     </ul>
@@ -199,8 +204,8 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
     <!-- Breadcrumb End -->
 
-    <!-- List Photographer Section Begin -->
-    <section class="photographer-list spad">
+ <!-- List Photographer Section Begin -->
+<section class="photographer-list spad">
     <div class="container">
         <!-- Title -->
         <div class="row">
@@ -210,37 +215,138 @@ $photographers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
+
+        <!-- Search Form -->
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6">
+                <form method="GET" action="" class="search-form">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control" placeholder="Cari Fotografer..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                        <button type="submit" class="btn modern-btn">
+                            <i class="fa fa-search"></i> Cari
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div class="card-scroll">
             <?php
-            // Query untuk mengambil data fotografer dengan role 'fotografer' dari tabel users
-            $stmt = $conn->prepare("SELECT * FROM users WHERE role = 'fotografer'");
+            // Query untuk mengambil data fotografer
+            $query = "SELECT * FROM users WHERE role = 'fotografer'";
+
+            // Jika ada input pencarian
+            if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
+                $search = "%" . trim($_GET['search']) . "%";
+                $query .= " AND name LIKE :search";
+            }
+
+            $stmt = $conn->prepare($query);
+
+            // Jika ada input pencarian, bind parameter
+            if (isset($search)) {
+                $stmt->bindParam(':search', $search);
+            }
+
             $stmt->execute();
             $fotograferList = $stmt->fetchAll();
 
             // Loop untuk menampilkan setiap fotografer
-            foreach ($fotograferList as $fotografer) {
-                ?>
-                <div class="col-lg-4 col-md-6">
-                    <div class="photographer-card modern-card">
-                        <div class="card-img">
-                            <img src="uploads/<?php echo (!empty($user['profiluser']) ? $user['profiluser'] : 'defaultprofil.jpg'); ?>" alt=" <?php htmlspecialchars($fotografer['name']);?>" class="img-fluid">
-                        </div>
-                        <div class="photographer-info">
-                            <h5> <?php echo $fotografer['name'];?></h5>
-                            <span>Wedding & Events</span>
-                            <p>Specialized in capturing unforgettable moments with a cinematic touch.</p>
-                            <a href="profilfotografer.php?id=<?php echo $fotografer['id']?>" class="btn modern-btn">View Profile</a>
+            if (!empty($fotograferList)) {
+                foreach ($fotograferList as $fotografer) {
+                    ?>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="photographer-card modern-card">
+                            <div class="card-img">
+                                <!-- Menampilkan foto profil sesuai dengan fotografer -->
+                                <img src="uploads/<?php echo (!empty($fotografer['profiluser']) ? $fotografer['profiluser'] : 'defaultprofil.jpg'); ?>" alt="<?php echo htmlspecialchars($fotografer['name']); ?>" class="img-fluid">
+                            </div>
+                            <div class="photographer-info">
+                                <h5><?php echo htmlspecialchars($fotografer['name']); ?></h5>
+                                <p><?php echo !empty($fotografer['bio']) ? htmlspecialchars($fotografer['bio']) : 'Fotografer belum membuat bio tentangnya.'; ?></p>
+                                <p><?php echo !empty($fotografer['skills']) ? htmlspecialchars($fotografer['skills']) : 'Fotografer belum mencantumkan skillnya.'; ?></p>
+                                <a href="profilfotografer.php?id=<?php echo $fotografer['id']; ?>" class="btn modern-btn">
+                                    <i class="fa fa-eye"></i> View Profile
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <?php
+                    <?php
+                }
+            } else {
+                echo "<p class='text-center'>Fotografer tidak ditemukan.</p>";
             }
             ?>
         </div>
     </div>
 </section>
+<!-- List Photographer Section End -->
 
-    <!-- List Photographer Section End -->
+
+<!-- Custom CSS -->
+<style>
+    /* Search Form */
+    .search-form {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .search-form .input-group {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 4px; /* Ubah ke kotak dengan sudut tajam */
+        overflow: hidden;
+        background-color: #f9f9f9;
+    }
+
+    .search-form .input-group-text {
+        background-color: #fff;
+        border: none;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #777;
+    }
+
+    .search-form .form-control {
+        flex: 1;
+        border: none;
+        padding: 10px;
+        font-size: 16px;
+        background: none;
+        color: #333;
+    }
+
+    .search-form .btn {
+        background-color: #009603;
+        color: #fff;
+        padding: 10px 20px;
+        font-weight: bold;
+        border: none;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-form .btn i {
+        margin-right: 5px;
+    }
+
+    .search-form .btn:hover {
+        background-color: #006c03;
+    }
+</style>
+
+<!-- Font Awesome CDN -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+
 
     <!-- Footer Section Begin -->
     <footer class="footer-section">

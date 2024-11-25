@@ -66,7 +66,12 @@ require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database 
                                 <li><a href="./blog.php">Lens</a></li>
                                 <li><a href="#">Laman</a>
                                     <ul class="dropdown">
-                                        <li><a href="./membership.php">Membership</a></li>
+                                        <!-- Pengecekan role dan pengalihan link Membership -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'fotografer'): ?>
+                                            <li><a href="./membership_details.php">Membership</a></li>
+                                        <?php else: ?>
+                                            <li><a href="./membership.php">Membership</a></li>
+                                        <?php endif; ?>
                                         <li><a href="./portfolio-details.php">Detail Portofolio</a></li>
                                         <li><a href="./blog-details.php">Detail Blog</a></li>
                                     </ul>
@@ -77,6 +82,7 @@ require_once 'koneksi.php'; // Pastikan file ini mengandung koneksi ke database 
                                 <li><a href="login.php">Login</a></li>
                             <?php endif; ?>
                         </ul>
+
                     </nav>
                     <div id="mobile-menu-wrap"></div>
                 </div>

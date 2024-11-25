@@ -2,25 +2,30 @@
 // Koneksi ke database
 require_once 'koneksi.php';
 
+// Tangani notifikasi update sukses
+if (isset($_GET['update']) && $_GET['update'] === 'success') {
+    echo '<div class="alert alert-success">Data berhasil diperbarui.</div>';
+}
+
 // Tentukan jumlah data per halaman
 $perPage = 7;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// Query untuk menghitung total data fotografer
-$queryCount = "SELECT COUNT(*) FROM users WHERE role = 'fotografer'";
+// Query untuk menghitung total data pada tabel contact
+$queryCount = "SELECT COUNT(*) FROM contact";
 $stmtCount = $conn->prepare($queryCount);
 $stmtCount->execute();
-$totalFotografer = $stmtCount->fetchColumn();
-$totalPages = ceil($totalFotografer / $perPage);
+$totalContacts = $stmtCount->fetchColumn();
+$totalPages = ceil($totalContacts / $perPage);
 
-// Query untuk mengambil data fotografer dengan pagination
-$query = "SELECT * FROM users WHERE role = 'fotografer' LIMIT :offset, :perPage";
+// Query untuk mengambil data dari tabel contact dengan pagination
+$query = "SELECT id, name, email, message, created_at FROM contact LIMIT :offset, :perPage";
 $stmt = $conn->prepare($query);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->bindValue(':perPage', $perPage, PDO::PARAM_INT);
 $stmt->execute();
-$fotografer = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Jika logout diakses, akhiri sesi dan arahkan ke halaman login
 if (isset($_GET['logout'])) {
@@ -38,13 +43,9 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fotografer - Admin Panel</title>
-
-    <!-- Import Google Fonts -->
+    <title>Pengguna - Admin Panel</title>
     <link href="https://fonts.googleapis.com/css?family=Quantico:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome untuk Ikon -->
     <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
 
     <style>
@@ -322,10 +323,9 @@ if (isset($_GET['logout'])) {
 
     <div class="main-content">
         <div class="header">
-            <h1>Fotografer</h1>
+            <h1>User</h1>
         </div>
 
-        <!-- Tabel Data Fotografer -->
         <table>
             <tr>
                 <th>ID</th>
@@ -334,13 +334,10 @@ if (isset($_GET['logout'])) {
                 <th>Email</th>
                 <th>Nomor Telepon</th>
                 <th>Bio</th>
-                <th>Skill</th>
-                <th>Aksi</th>
                 <th>Role</th>
             </tr>
 
-            <!-- Contoh data fotografer, gantikan dengan PHP untuk mengambil dari database -->
-            <?php foreach ($fotografer as $user): ?>
+            <?php foreach ($users as $user): ?>
                 <tr>
                     <td><?= $user['id'] ?></td>
                     <td><img src="uploads/<?= !empty($user['profiluser']) ? $user['profiluser'] : 'defaultprofil.jpg' ?>"
@@ -349,8 +346,6 @@ if (isset($_GET['logout'])) {
                     <td><?= $user['email'] ?></td>
                     <td><?= $user['phone'] ?></td>
                     <td><?= $user['bio'] ?></td>
-                    <td><?= $user['skills'] ?></td>
-                    <td><?= $user['role'] ?></td>
                     <td class="action-buttons">
                         <button class="edit-btn"
                             onclick="openModal(<?= htmlspecialchars(json_encode($user), ENT_QUOTES, 'UTF-8') ?>)">Edit</button>
@@ -358,11 +353,12 @@ if (isset($_GET['logout'])) {
                         <!-- Tombol Delete menggunakan button -->
                         <button class="delete-btn" onclick="deleteUser(<?= $user['id'] ?>)">Hapus</button>
                     </td>
+
+
                 </tr>
             <?php endforeach; ?>
         </table>
 
-        <!-- Pagination -->
         <div class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <a href="?page=<?= $i ?>" class="<?= $page == $i ? 'active' : '' ?>"><?= $i ?></a>
@@ -376,7 +372,7 @@ if (isset($_GET['logout'])) {
             <div class="modal-content">
                 <div class="modal-header">Edit Pengguna</div>
                 <div class="modal-body">
-                    <form id="editForm" method="post" action="updatefotografer.php">
+                    <form id="editForm" method="post" action="updateuser.php">
                         <input type="hidden" name="id" id="userId">
 
                         <label for="userName">Nama</label>
@@ -421,6 +417,7 @@ if (isset($_GET['logout'])) {
                 document.getElementById('userName').value = user.name;
                 document.getElementById('userEmail').value = user.email;
                 document.getElementById('userPhone').value = user.phone;
+                document.getElementById('userBio').value = user.bio;
                 document.getElementById('userRole').value = user.role;
                 modal.style.display = 'flex';
             }
@@ -438,9 +435,10 @@ if (isset($_GET['logout'])) {
                 // Tampilkan konfirmasi sebelum menghapus
                 if (confirm('Apakah Anda yakin ingin menghapus akun ini?')) {
                     // Jika konfirmasi benar, arahkan ke halaman deleteuser.php dengan ID pengguna
-                    window.location.href = 'deletefotografer.php?id=' + userId;
+                    window.location.href = 'deleteuser.php?id=' + userId;
                 }
             }
+
         </script>
 
 </body>

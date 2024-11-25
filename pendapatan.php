@@ -118,7 +118,7 @@
     <div class="sidebar">
         <h2>Panel Admin</h2>
         <a href="adminpanel.php"><i class="fa fa-dashboard"></i> Beranda</a>
-        <a href="manageuser.php"><i class="fa fa-users"></i> Pengguna</a>
+        <a href="manageuser.php"><i class="fa fa-users"></i> User</a>
         <a href="managefotografer.php"><i class="fa fa-camera"></i> Fotografer</a>
         <a href="pendapatan.php"><i class="fa fa-money"></i> Pendapatan</a>
         <a href="#logout"><i class="fa fa-sign-out"></i> Logout</a>

@@ -2,26 +2,39 @@
 // Koneksi ke database
 require_once 'koneksi.php';
 
+if (isset($_GET['update']) && $_GET['update'] === 'success') {
+
+}
+
 // Tentukan jumlah data per halaman
 $perPage = 7;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// Query untuk menghitung total data pengguna
-$queryCount = "SELECT COUNT(*) FROM users";
+// Query untuk menghitung total data pengguna dengan role 'user'
+$queryCount = "SELECT COUNT(*) FROM users WHERE role = 'user'";
 $stmtCount = $conn->prepare($queryCount);
 $stmtCount->execute();
 $totalUsers = $stmtCount->fetchColumn();
 $totalPages = ceil($totalUsers / $perPage);
 
-// Query untuk mengambil data pengguna dengan pagination
-$query = "SELECT * FROM users LIMIT :offset, :perPage";
+// Query untuk mengambil data pengguna dengan role 'user' dan pagination
+$query = "SELECT * FROM users WHERE role = 'user' LIMIT :offset, :perPage";
 $stmt = $conn->prepare($query);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->bindValue(':perPage', $perPage, PDO::PARAM_INT);
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Jika logout diakses, akhiri sesi dan arahkan ke halaman login
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header("Location: index.php"); // Ganti dengan halaman login Anda
+    exit();
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
@@ -172,8 +185,12 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            /* Pastikan modal menggunakan flexbox */
             align-items: center;
+            /* Vertikal center */
             justify-content: center;
+            /* Horizontal center */
         }
 
         .modal-content {
@@ -183,6 +200,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             width: 400px;
             max-width: 90%;
             animation: fadeIn 0.4s ease;
+            box-sizing: border-box;
+            /* Pastikan padding tidak menambah lebar */
         }
 
         .modal-header {
@@ -199,13 +218,16 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .modal-body input[type="text"],
         .modal-body input[type="email"],
-        .modal-body input[type="tel"] {
+        .modal-body input[type="tel"],
+        .modal-body input[type="bio"] {
             width: 100%;
             padding: 8px;
             margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 4px;
             outline: none;
+            box-sizing: border-box;
+            /* Pastikan padding tidak menambah lebar */
         }
 
         .modal-footer {
@@ -233,6 +255,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #fff;
         }
 
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -242,7 +265,48 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 opacity: 1;
             }
         }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+            background-color: #fff;
+        }
     </style>
+
+    <script>
+        // Fungsi Logout dengan konfirmasi
+        function logout() {
+            if (confirm("Apakah anda yakin ingin keluar?")) {
+                window.location.href = 'adminpanel.php?logout=true';
+            }
+        }
+
+        // Fungsi untuk membuka modal
+        function openModal() {
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // Fungsi untuk menutup modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Fungsi untuk menyimpan perubahan (menutup modal setelahnya)
+        function saveChanges() {
+            // Menyimpan data di sini
+            closeModal(); // Tutup modal setelah perubahan disimpan
+        }
+
+        // Pastikan modal tersembunyi saat halaman dimuat ulang
+        window.onload = function () {
+            document.getElementById('editModal').style.display = 'none';
+        };
+
+    </script>
 </head>
 
 <body>
@@ -250,15 +314,15 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="sidebar">
         <h2>Panel Admin</h2>
         <a href="adminpanel.php"><i class="fa fa-dashboard"></i> Beranda</a>
-        <a href="manageuser.php"><i class="fa fa-users"></i> Pengguna</a>
+        <a href="manageuser.php"><i class="fa fa-users"></i> User</a>
         <a href="managefotografer.php"><i class="fa fa-camera"></i> Fotografer</a>
         <a href="pendapatan.php"><i class="fa fa-money"></i> Pendapatan</a>
-        <a href="#logout"><i class="fa fa-sign-out"></i> Logout</a>
+        <a href="javascript:void(0);" onclick="logout()"><i class="fa fa-sign-out"></i> Logout</a>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h1>Fotografer</h1>
+            <h1>User</h1>
         </div>
 
         <table>
@@ -286,8 +350,12 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td class="action-buttons">
                         <button class="edit-btn"
                             onclick="openModal(<?= htmlspecialchars(json_encode($user), ENT_QUOTES, 'UTF-8') ?>)">Edit</button>
-                        <button class="delete-btn" onclick="alert('Fungsi Hapus Tidak Aktif')">Hapus</button>
+
+                        <!-- Tombol Delete menggunakan button -->
+                        <button class="delete-btn" onclick="deleteUser(<?= $user['id'] ?>)">Hapus</button>
                     </td>
+
+
                 </tr>
             <?php endforeach; ?>
         </table>
@@ -307,50 +375,72 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="modal-body">
                     <form id="editForm" method="post" action="updateuser.php">
                         <input type="hidden" name="id" id="userId">
+
                         <label for="userName">Nama</label>
                         <input type="text" name="name" id="userName" required>
+
                         <label for="userEmail">Email</label>
                         <input type="email" name="email" id="userEmail" required>
+
                         <label for="userPhone">Nomor Telepon</label>
                         <input type="tel" name="phone" id="userPhone">
+
+                        <label for="userBio">Bio</label>
+                        <input type="bio" name="bio" id="userBio">
+
                         <label for="userRole">Role</label>
-                        <input type="text" name="role" id="userRole">
+                        <select name="role" id="userRole" required>
+                            <option value="">-- Pilih Role --</option>
+                            <option value="user">User</option>
+                            <option value="fotografer">Fotografer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="save-btn">Simpan</button>
+                            <button type="button" class="cancel-btn" onclick="closeModal()">Batal</button>
+                        </div>
+                    </form>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="save-btn">Simpan</button>
-                    <button type="button" class="cancel-btn" onclick="closeModal()">Batal</button>
-                </div>
-                </form>
             </div>
         </div>
-    </div>
 
-    <script>
-        function openEditModal() {
-            // Menampilkan modal untuk mengedit profil
-            $('#editProfileModal').modal('show');
-        }
-        const modal = document.getElementById('editModal');
-
-        function openModal(user) {
-            document.getElementById('userId').value = user.id;
-            document.getElementById('userName').value = user.name;
-            document.getElementById('userEmail').value = user.email;
-            document.getElementById('userPhone').value = user.phone;
-            document.getElementById('userRole').value = user.role;
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            modal.style.display = 'none';
-        }
-
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                closeModal();
+        <script>
+            function openEditModal() {
+                // Menampilkan modal untuk mengedit profil
+                $('#editProfileModal').modal('show');
             }
-        }
-    </script>
+            const modal = document.getElementById('editModal');
+
+            function openModal(user) {
+                document.getElementById('userId').value = user.id;
+                document.getElementById('userName').value = user.name;
+                document.getElementById('userEmail').value = user.email;
+                document.getElementById('userPhone').value = user.phone;
+                document.getElementById('userBio').value = user.bio;
+                document.getElementById('userRole').value = user.role;
+                modal.style.display = 'flex';
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+            function deleteUser(userId) {
+                // Tampilkan konfirmasi sebelum menghapus
+                if (confirm('Apakah Anda yakin ingin menghapus akun ini?')) {
+                    // Jika konfirmasi benar, arahkan ke halaman deleteuser.php dengan ID pengguna
+                    window.location.href = 'deleteuser.php?id=' + userId;
+                }
+            }
+
+        </script>
 
 </body>
 

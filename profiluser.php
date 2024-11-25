@@ -38,6 +38,9 @@ if (!$user) {
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css?family=Quantico:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap" rel="stylesheet">
+    <!-- Memuat Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
@@ -86,7 +89,12 @@ if (!$user) {
                                 <li><a href="./blog.php">Lens</a></li>
                                 <li><a href="#">Laman</a>
                                     <ul class="dropdown">
-                                        <li><a href="./membership.php">Membership</a></li>
+                                        <!-- Pengecekan role dan pengalihan link Membership -->
+                                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'fotografer'): ?>
+                                            <li><a href="./membership_details.php">Membership</a></li>
+                                        <?php else: ?>
+                                            <li><a href="./membership.php">Membership</a></li>
+                                        <?php endif; ?>
                                         <li><a href="./portfolio-details.php">Detail Portofolio</a></li>
                                         <li><a href="./blog-details.php">Detail Blog</a></li>
                                     </ul>
@@ -136,12 +144,33 @@ if (!$user) {
                         </form>
                         <h3 class="username"><?php echo htmlspecialchars($user['name']); ?></h3>
                         <p class="role text-muted"><?php echo htmlspecialchars($user['role']); ?></p>
+
+                        <?php if ($user['role'] === 'fotografer' && !empty($user['skills'])): ?>
+                            <div class="skills-list mt-3">
+                                <?php
+                                $skillsArray = explode(',', $user['skills']); // Mengubah string keahlian menjadi array
+                                $count = 0; // Inisialisasi penghitung untuk membatasi 3 skill per baris
+                                foreach ($skillsArray as $skill) {
+                                    echo '<div class="skill-item">' . htmlspecialchars($skill) . '</div>';
+
+                                    $count++;
+                                    if ($count == 3) {
+                                        echo '<div class="clearfix"></div>'; // Membuat baris baru setelah 3 skill
+                                        $count = 0; // Reset penghitung untuk baris berikutnya
+                                    }
+                                }
+                                ?>
+                            </div>
+                        <?php endif; ?>
+
+
                         <div class="button-group mt-3">
                             <!-- Tombol Edit Profil dan Logout -->
                             <button class="btn btn-primary" onclick="openEditModal()">Edit Profil</button>
                             <button class="btn btn-danger ms-2" onclick="logout()">Logout</button>
                         </div>
                     </div>
+
                 </div>
                 <div class="col-lg-8">
                     <div class="profile-info">
@@ -201,6 +230,33 @@ if (!$user) {
                             <textarea class="form-control" id="aboutme" name="bio" rows="3"
                                 required><?php echo htmlspecialchars($user['bio']); ?></textarea>
                         </div>
+                        <!-- Pilihan keahlian -->
+                        <?php if ($user['role'] === 'fotografer'): ?>
+                            <div class="mb-3">
+                                <label class="form-label">Keahlian</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="skills[]" value="Pernikahan" <?php echo (strpos($user['skills'], 'Pernikahan') !== false ? 'checked' : ''); ?>>
+                                    <label class="form-check-label" for="skillWedding">Pernikahan</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="skills[]" value="Potret" <?php echo (strpos($user['skills'], 'Potret') !== false ? 'checked' : ''); ?>>
+                                    <label class="form-check-label" for="skillPortrait">Potret</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="skills[]" value="Acara" <?php echo (strpos($user['skills'], 'Acara') !== false ? 'checked' : ''); ?>>
+                                    <label class="form-check-label" for="skillEvent">Acara</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="skills[]" value="Produk" <?php echo (strpos($user['skills'], 'Produk') !== false ? 'checked' : ''); ?>>
+                                    <label class="form-check-label" for="skillProduct">Produk</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="skills[]" value="Alam" <?php echo (strpos($user['skills'], 'Alam') !== false ? 'checked' : ''); ?>>
+                                    <label class="form-check-label" for="skillNature">Alam</label>
+                                </div>
+                                <small class="text-muted">Pilih lebih dari satu jika diperlukan.</small>
+                            </div>
+                        <?php endif; ?>
                         <div class="mb-3">
                             <button type="submit" class="btn btn-primary">Update Profil</button>
                         </div>
@@ -209,6 +265,7 @@ if (!$user) {
             </div>
         </div>
     </div>
+
 
     <!-- Tambahkan Script JavaScript untuk Logout dan Edit Profil -->
     <script>
@@ -339,6 +396,64 @@ if (!$user) {
         .button-group .btn {
             margin-left: 10px;
             /* Margin kiri untuk jarak antar tombol */
+        }
+
+        /* Kontainer untuk menampilkan keahlian */
+        .skills-list {
+            display: flex;
+            /* Menyusun keahlian secara horizontal */
+            flex-wrap: wrap;
+            /* Membungkus keahlian jika melebihi lebar */
+            justify-content: center;
+            /* Menyusun skill di tengah */
+            gap: 6px;
+            /* Mengurangi jarak antar elemen (dari sebelumnya 10px menjadi 6px) */
+            margin-top: 10px;
+            /* Menambahkan jarak atas */
+            align-items: center;
+            /* Menyusun skill secara vertikal di tengah */
+            text-align: center;
+            /* Mengatur teks agar terpusat */
+        }
+
+        /* Setiap item keahlian tanpa card, hanya teks */
+        .skill-item {
+            font-size: 12px;
+            /* Ukuran teks tetap kecil */
+            color: #333;
+            /* Warna teks */
+            font-weight: 500;
+            /* Teks lebih tebal */
+            display: inline-block;
+            /* Setiap item skill muncul dalam baris yang sama */
+            text-align: center;
+            /* Menyusun teks di tengah */
+            padding: 5px 10px;
+            /* Mengatur jarak di dalam elemen skill */
+            transition: transform 0.3s ease;
+            /* Transisi saat hover */
+            cursor: pointer;
+            /* Mengubah kursor untuk interaktivitas */
+            max-width: 80px;
+            /* Membatasi lebar tiap elemen skill */
+        }
+
+        /* Efek saat hover pada item keahlian */
+        .skill-item:hover {
+            transform: scale(1.05);
+            /* Memperbesar saat hover */
+            color: #007bff;
+            /* Warna teks berubah saat hover */
+        }
+
+        /* Responsif untuk perangkat kecil */
+        @media (max-width: 768px) {
+            .skill-item {
+                font-size: 11px;
+                /* Ukuran font lebih kecil di layar kecil */
+                max-width: 100%;
+                /* Maksimal lebar 100% pada perangkat kecil */
+            }
         }
     </style>
 
